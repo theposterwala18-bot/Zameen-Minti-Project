@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pa">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zameen Minti Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1 id="appTitle">ਜ਼ਮੀਨ ਮਿਣਤੀ ਕੈਲਕੂਲੇਟਰ</h1>
+        <p id="subtitle">Punjab Land Measurement Calculator</p>
+      </div>
+      <div class="top-actions">
+        <select id="languageSelect">
+          <option value="pa">ਪੰਜਾਬੀ</option>
+          <option value="en">English</option>
+        </select>
+        <button onclick="openOwnerPanel()" id="ownerBtn">Owner Settings</button>
+      </div>
+    </header>
+
+    <section class="member-topbar">
+      <div>
+        <b>Client Account</b>
+        <span id="topMemberStatus">Guest mode — calculation free ਹੈ</span>
+      </div>
+      <div class="member-actions">
+        <button onclick="openAuthModal()" id="loginTopBtn">Login / Signup</button>
+        <button onclick="openPrivateChat()" id="chatTopBtn" class="primary hidden">Private Chat</button>
+        <button onclick="logoutMember()" id="logoutTopBtn" class="hidden">Logout</button>
+      </div>
+    </section>
+
+    
+    <nav class="app-nav">
+      <button class="nav-pill" onclick="showModule('dashboard')"><span>⌂</span> Dashboard</button>
+      <button class="nav-pill active" onclick="showModule('measurement')"><span>📐</span> ਜ਼ਮੀਨ ਦੀ ਮਿਣਤੀ</button>
+      <button class="nav-pill" onclick="showModule('theka')"><span>🌾</span> ਠੇਕਾ ਤੇ ਜ਼ਮੀਨ</button>
+      <button class="nav-pill" onclick="showModule('sale')"><span>💰</span> Sale</button>
+      <button class="nav-pill" onclick="showModule('reports')"><span>📄</span> Reports</button>
+      <button class="nav-pill disabled-nav" type="button"><span>🧾</span> ਹੋਰ ਟੂਲਜ਼ ▾</button>
+      <div class="nav-spacer"></div>
+      <button class="nav-pill small-nav" onclick="openPrivateChat()">💬 ਚੈਟ</button>
+      <button class="nav-pill small-nav" type="button">🔔 ਨੋਟੀਫਿਕੇਸ਼ਨ</button>
+    </nav>
+
+    <main>
+
+      <section id="dashboardModule" class="dashboard-module">
+        <h2>ਮੁੱਖ Dashboard</h2>
+        <div class="project-lock-badge">🔒 Zameen Minti Project Locked v13 — Software/Site Update Mode</div>
+        <p class="dash-intro">
+          ਇਹ ਸਿਸਟਮ ਜ਼ਮੀਨ ਨਾਲ ਸੰਬੰਧਿਤ ਵੱਖ-ਵੱਖ ਕੰਮਾਂ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ।
+          ਹੇਠਾਂ ਦਿੱਤੇ module ਵਿਚੋਂ ਆਪਣੀ ਲੋੜ ਮੁਤਾਬਕ option ਚੁਣੋ।
+        </p>
+
+        <div class="module-grid">
+          <button class="module-card" onclick="showModule('measurement')">
+            <span class="module-icon">📐</span>
+            <b>ਜ਼ਮੀਨ ਦੀ ਮਿਣਤੀ</b>
+            <small>ਲੰਬਾਈ-ਚੌੜਾਈ, 4-side plot, triangle ਆਦਿ ਦੀ ਮਿਣਤੀ ਕਰਕੇ sq ft, ਮਰਲੇ, ਕਨਾਲਾਂ, ਏਕੜ/ਕਿੱਲਾ ਵਿੱਚ result ਵੇਖੋ।</small>
+          </button>
+
+          <button class="module-card" onclick="showModule('theka')">
+            <span class="module-icon">🌾</span>
+            <b>ਠੇਕਾ ਤੇ ਜ਼ਮੀਨ</b>
+            <small>1 ਏਕੜ/ਕਿੱਲਾ ਦੇ ਠੇਕੇ ਦੇ rate ਨਾਲ ਕਨਾਲਾਂ, ਮਰਲਿਆਂ ਅਤੇ ਕੁੱਲ ਸਾਲਾਨਾ ਠੇਕੇ ਦੀ calculation ਕਰੋ।</small>
+          </button>
+
+          <button class="module-card disabled-card" type="button">
+            <span class="module-icon">💰</span>
+            <b>ਜ਼ਮੀਨ Rate / Sale</b>
+            <small>Future: ਜ਼ਮੀਨ ਦੀ ਕੀਮਤ, per acre rate, total sale value, registry estimate।</small>
+          </button>
+
+          <button class="module-card disabled-card" type="button">
+            <span class="module-icon">📄</span>
+            <b>Report / Record</b>
+            <small>Future: client wise saved reports, PDF, print history ਅਤੇ premium tools।</small>
+          </button>
+        
+          <button class="module-card" onclick="showModule('sale')">
+            <span class="module-icon">💰</span>
+            <b>ਜ਼ਮੀਨ Rate / Sale</b>
+            <small>1 ਏਕੜ/ਕਿੱਲਾ rate ਨਾਲ total sale value, advance ਅਤੇ balance ਕੱਢੋ।</small>
+          </button>
+
+          <button class="module-card" onclick="showModule('registry')">
+            <span class="module-icon">📑</span>
+            <b>Registry Estimate</b>
+            <small>Stamp duty, registration fee ਅਤੇ rough registry kharcha estimate ਕਰੋ।</small>
+          </button>
+
+          <button class="module-card" onclick="showModule('reports')">
+            <span class="module-icon">📄</span>
+            <b>Report / Record</b>
+            <small>Saved calculation reports ਅਤੇ print history ਵੇਖੋ।</small>
+          </button>
+
+          <button class="module-card" onclick="showModule('gps')">
+            <span class="module-icon">🌍</span>
+            <b>GPS / Map ਮਿਣਤੀ</b>
+            <small>Future: Google Maps ਤੇ points select ਕਰਕੇ area calculate ਕਰੋ।</small>
+          </button>
+
+          <button class="module-card" onclick="showModule('admin')">
+            <span class="module-icon">👨‍💼</span>
+            <b>Owner Admin</b>
+            <small>Clients, reports, chats ਅਤੇ analytics ਦਾ owner dashboard।</small>
+          </button>
+        </div>
+
+        <div class="suggestion-box">
+          <h3>ਸੁਝਾਅ / Future Add-ons</h3>
+          <ul>
+            <li>Client login ਨਾਲ saved calculation history।</li>
+            <li>Owner admin panel ਜਿੱਥੇ ਸਾਰੇ clients, chats ਅਤੇ reports ਵੇਖ ਸਕੀਏ।</li>
+            <li>Premium plan: PDF report, saved record, advanced irregular shape calculation।</li>
+            <li>Map/GPS measurement future ਵਿੱਚ add ਕੀਤਾ ਜਾ ਸਕਦਾ ਹੈ।</li>
+            <li>Rate calculator: 1 ਏਕੜ/ਕਿੱਲਾ rate ਪਾ ਕੇ total ਕੀਮਤ ਅਤੇ per marla/per kanal value।</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="measurementModule" class="calculator-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2 id="selectShapeTitle">ਜ਼ਮੀਨ ਦੀ ਮਿਣਤੀ</h2>
+
+        <div class="shape-tabs">
+          <button class="tab active" onclick="setShape('rectangle')" id="rectTab">Rectangle</button>
+          <button class="tab" onclick="setShape('unequal')" id="unequalTab">4-Side Plot</button>
+          <button class="tab" onclick="setShape('triangle')" id="triangleTab">Triangle</button>
+        </div>
+
+        <div id="shapeDiagram" class="diagram"></div>
+
+        <form id="calcForm" onsubmit="calculateArea(event)">
+          <div id="fields"></div>
+          <button type="submit" class="primary" id="calculateBtn">Calculate</button>
+        </form>
+
+        <div id="result" class="result hidden"></div>
+      </section>
+
+
+      <section id="thekaModule" class="theka-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>ਠੇਕਾ ਤੇ ਜ਼ਮੀਨ</h2>
+        <div id="thekaSummaryStrip" class="theka-summary-strip hidden">
+          <span>1 ਏਕੜ/ਕਿੱਲਾ ਦਾ ਠੇਕਾ: <b id="sumAcreRate">₹0</b></span>
+          <span>ਏਕੜ/ਕਿੱਲੇ: <b id="sumAcres">0</b></span>
+          <span>ਕਨਾਲਾਂ: <b id="sumKanal">0</b></span>
+          <span>ਮਰਲੇ: <b id="sumMarla">0</b></span>
+        </div>
+        <div class="help-box">
+          ਪਹਿਲਾਂ 1 ਏਕੜ/ਕਿੱਲਾ ਦਾ ਸਾਲਾਨਾ ਠੇਕਾ ਭਰੋ। ਫਿਰ ਕਿੰਨੇ ਏਕੜ/ਕਿੱਲੇ, ਕਨਾਲਾਂ, ਮਰਲੇ ਹਨ ਉਹ ਭਰੋ। System ਆਪਣੇ ਆਪ 1 ਕਨਾਲ ਤੇ 1 ਮਰਲੇ ਦੀ value ਕੱਢ ਕੇ final ਠੇਕਾ ਅਤੇ 2 ਕਿਸ਼ਤਾਂ ਦਿਖਾਏਗਾ।
+        </div>
+
+        <div class="grid-2">
+          <label>1 ਏਕੜ/ਕਿੱਲਾ ਦਾ ਠੇਕਾ
+            <input id="sepAcreRate" type="number" step="0.01" placeholder="ਜਿਵੇਂ 80000">
+          </label>
+          <label>ਏਕੜ/ਕਿੱਲੇ
+            <input id="sepAcres" type="number" step="0.01" placeholder="ਜਿਵੇਂ 5">
+          </label>
+          <label>ਕਨਾਲਾਂ
+            <input id="sepKanal" type="number" step="0.01" placeholder="ਜਿਵੇਂ 42">
+          </label>
+          <label>ਮਰਲੇ
+            <input id="sepMarla" type="number" step="0.01" placeholder="ਜਿਵੇਂ 4">
+          </label>
+        </div>
+
+        <button class="primary" onclick="calculateSeparateTheka()">Calculate Theka</button>
+        <div id="sepThekaResult" class="result hidden"></div>
+      </section>
+
+      <section id="saleModule" class="sale-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>ਜ਼ਮੀਨ Rate / Sale Calculator</h2>
+        <div class="help-box">1 ਏਕੜ/ਕਿੱਲਾ ਦਾ rate ਭਰੋ, ਫਿਰ ਜ਼ਮੀਨ ਦੇ ਏਕੜ/ਕਨਾਲ/ਮਰਲੇ ਭਰੋ। System total sale value ਅਤੇ per kanal/per marla value ਦਿਖਾਏਗਾ।</div>
+        <div class="grid-2">
+          <label>1 ਏਕੜ/ਕਿੱਲਾ Rate <input id="saleAcreRate" type="number" step="0.01" placeholder="ਜਿਵੇਂ 5000000"></label>
+          <label>ਏਕੜ/ਕਿੱਲੇ <input id="saleAcres" type="number" step="0.01" placeholder="ਜਿਵੇਂ 2"></label>
+          <label>ਕਨਾਲਾਂ <input id="saleKanal" type="number" step="0.01" placeholder="ਜਿਵੇਂ 4"></label>
+          <label>ਮਰਲੇ <input id="saleMarla" type="number" step="0.01" placeholder="ਜਿਵੇਂ 10"></label>
+          <label>Advance / Token <input id="saleAdvance" type="number" step="0.01" placeholder="optional"></label>
+        </div>
+        <button class="primary" onclick="calculateSale()">Calculate Sale</button>
+        <div id="saleResult" class="result hidden"></div>
+      </section>
+
+      <section id="registryModule" class="registry-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>Registry Estimate Calculator</h2>
+        <div class="help-box">ਇਹ rough estimate ਹੈ। ਅਸਲ registry charges ਸਰਕਾਰੀ rules/district ਮੁਤਾਬਕ change ਹੋ ਸਕਦੇ ਹਨ।</div>
+        <div class="grid-2">
+          <label>Sale Amount <input id="regAmount" type="number" step="0.01" placeholder="ਜਿਵੇਂ 5000000"></label>
+          <label>Stamp Duty % <input id="stampPercent" type="number" step="0.01" value="6"></label>
+          <label>Registration Fee % <input id="regPercent" type="number" step="0.01" value="1"></label>
+          <label>Other Charges <input id="otherCharges" type="number" step="0.01" value="0"></label>
+        </div>
+        <button class="primary" onclick="calculateRegistry()">Calculate Registry Estimate</button>
+        <div id="registryResult" class="result hidden"></div>
+      </section>
+
+      <section id="reportsModule" class="reports-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>Saved Reports History</h2>
+        <div class="help-box">ਇੱਥੇ ਇਸ browser ਵਿੱਚ saved calculation reports ਦਿਖਣਗੀਆਂ। Real online version ਵਿੱਚ ਇਹ client account ਨਾਲ cloud database ਵਿੱਚ save ਹੋਣਗੀਆਂ।</div>
+        <div class="report-actions">
+          <button class="primary" onclick="loadReports()">Refresh Reports</button>
+          <button onclick="clearReports()">Clear Local Reports</button>
+        </div>
+        <div id="reportsList" class="reports-list"></div>
+      </section>
+
+      <section id="adminModule" class="admin-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>Owner Admin Dashboard</h2>
+        <div class="mini-dashboard">
+          <div><span>Registered Members</span><b id="adminMembers">0</b></div>
+          <div><span>Saved Chats</span><b id="adminChats">0</b></div>
+          <div><span>Saved Reports</span><b id="adminReports">0</b></div>
+          <div><span>Overall Visits</span><b id="adminVisits">0</b></div>
+        </div>
+        <div class="help-box">Owner panel future ਵਿੱਚ real clients, chats, premium plans, reports ਅਤੇ analytics control ਕਰੇਗਾ।</div>
+        <button class="primary" onclick="loadAdminStats()">Refresh Admin Stats</button>
+      </section>
+
+      
+      <section id="gpsModule" class="gps-card module-page hidden">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>GPS / Google Maps ਮਿਣਤੀ</h2>
+
+        <div class="help-box">
+          Map ਤੇ ਆਪਣੀ ਜ਼ਮੀਨ ਦੇ corner points add ਕਰੋ। System polygon area calculate ਕਰਕੇ sq ft, ਮਰਲੇ, ਕਨਾਲ ਅਤੇ ਏਕੜ/ਕਿੱਲਾ automatic ਕੱਢੇਗਾ।
+        </div>
+
+        <div class="gps-topbar">
+          <div class="gps-chip">📍 Click map to add points</div>
+          <div class="gps-chip">📐 Polygon auto measurement</div>
+          <div class="gps-chip">🌍 Irregular shape support</div>
+        </div>
+
+        <div class="fake-map-box">
+          <div class="map-grid"></div>
+
+          <button class="map-point point1" onclick="addGpsPoint('A')">A</button>
+          <button class="map-point point2" onclick="addGpsPoint('B')">B</button>
+          <button class="map-point point3" onclick="addGpsPoint('C')">C</button>
+          <button class="map-point point4" onclick="addGpsPoint('D')">D</button>
+
+          <svg class="polygon-lines" viewBox="0 0 1000 500" preserveAspectRatio="none">
+            <polygon points="180,120 760,110 860,360 260,390"
+             fill="rgba(15,107,58,.15)"
+             stroke="#0f6b3a"
+             stroke-width="4"/>
+          </svg>
+
+          <div class="map-center-label">Punjab Land GPS Area</div>
+        </div>
+
+        <div class="gps-controls">
+          <button class="primary" onclick="simulateGpsMeasurement()">Calculate GPS Area</button>
+          <button onclick="resetGpsMeasurement()">Reset Points</button>
+        </div>
+
+        <div id="gpsResult" class="result hidden"></div>
+
+        <div class="coming-soon-box">
+          <h3>🚀 Future Real Features</h3>
+          <ul>
+            <li>Real Google Maps integration</li>
+            <li>Live GPS walking measurement</li>
+            <li>Village-wise land save system</li>
+            <li>Client account map history</li>
+            <li>Satellite view measurement</li>
+          </ul>
+        </div>
+      </section>
+
+
+      <aside class="reference-card">
+        <h3 id="referenceTitle">Land Unit Reference</h3>
+        <ul id="referenceList"></ul>
+
+        <div class="contact-card">
+          <h3>Contact / Chat</h3>
+          <input id="clientName" type="text" placeholder="ਤੁਹਾਡਾ ਨਾਮ / Your name">
+          <input id="clientMobile" type="text" placeholder="Mobile number">
+          <textarea id="contactMessage" rows="4" placeholder="ਆਪਣਾ message ਲਿਖੋ..."></textarea>
+          <button class="primary full-btn" onclick="sendWhatsAppMessage()">WhatsApp ਤੇ ਭੇਜੋ</button>
+          <button class="full-btn" onclick="shareCurrentResult()">Result Share ਕਰੋ</button>
+          <button class="full-btn" onclick="openQuickChat()">Quick Chat</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="ownerModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-head">
+        <h2 id="ownerTitle">Owner Settings</h2>
+        <button onclick="closeOwnerPanel()">×</button>
+      </div>
+
+      <div id="passwordBox">
+        <label id="passwordLabel">Password</label>
+        <input type="password" id="ownerPassword" placeholder="Enter password" />
+        <button onclick="checkOwnerPassword()" class="primary" id="unlockBtn">Unlock</button>
+        <p class="hint">Default password: owner123</p>
+      </div>
+
+      <div id="settingsBox" class="hidden">
+        <div class="grid-2">
+          <label>1 Marla Sq Ft <input id="marlaSqft" type="number" step="0.01"></label>
+          <label>1 Kanal Sq Ft <input id="kanalSqft" type="number" step="0.01"></label>
+          <label>1 Acre/Killa Sq Ft <input id="acreSqft" type="number" step="0.01"></label>
+          <label>1 Kanal Marle <input id="kanalMarla" type="number" step="0.01"></label>
+          <label>1 Acre Kanal <input id="acreKanal" type="number" step="0.01"></label>
+          <label>1 Acre Marle <input id="acreMarla" type="number" step="0.01"></label>
+          <label>1 Acre Vishwasian <input id="acreVishwasian" type="number" step="0.01"></label>
+          <label>1 Kanal Vishwasian <input id="kanalVishwasian" type="number" step="0.01"></label>
+          <label>1 Bigha Vishwasian <input id="bighaVishwasian" type="number" step="0.01"></label>
+          <label>1 Karam Feet <input id="karamFeet" type="number" step="0.01"></label>
+          <label>Owner WhatsApp Number <input id="ownerWhatsapp" type="text" placeholder="9198xxxxxxxx"></label>
+        </div>
+        <div class="modal-actions">
+          <button onclick="saveSettings()" class="primary" id="saveBtn">Save Settings</button>
+          <button onclick="resetSettings()" id="resetBtn">Reset Default</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+
+  <div id="authModal" class="modal hidden">
+    <div class="modal-content auth-modal-content">
+      <div class="modal-head">
+        <h2>Client Login / Signup</h2>
+        <button onclick="closeAuthModal()">×</button>
+      </div>
+      <p class="hint">ਬਿਨਾਂ ID ਤੋਂ ਵੀ calculation free ਹੈ। ID ਬਣਾਉਣ ਨਾਲ private saved chat, future premium features ਅਤੇ personal history ਮਿਲੇਗੀ।</p>
+
+      <div class="auth-tabs">
+        <button class="tab active" id="signupTabBtn" onclick="setAuthMode('signup')">Signup</button>
+        <button class="tab" id="loginTabBtn" onclick="setAuthMode('login')">Login</button>
+      </div>
+
+      <div id="signupBox">
+        <label>Name <input id="signupName" type="text" placeholder="Your name"></label>
+        <label>Mobile <input id="signupMobile" type="text" placeholder="Mobile number"></label>
+        <label>Email <input id="signupEmail" type="email" placeholder="Email ID"></label>
+        <label>Password <input id="signupPassword" type="password" placeholder="Create password"></label>
+        <button class="primary full-btn" onclick="signupMember()">Create Account</button>
+      </div>
+
+      <div id="loginBox" class="hidden">
+        <label>Mobile or Email <input id="loginIdentity" type="text" placeholder="Mobile or Email"></label>
+        <label>Password <input id="loginPassword" type="password" placeholder="Password"></label>
+        <button class="primary full-btn" onclick="loginMember()">Login</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="privateChatModal" class="modal hidden">
+    <div class="modal-content private-chat-content">
+      <div class="modal-head">
+        <h2>Private Saved Chat</h2>
+        <button onclick="closePrivateChat()">×</button>
+      </div>
+      <div id="privateChatUser" class="small-status"></div>
+      <div id="privateChatWindow" class="chat-window private-chat-window"></div>
+      <textarea id="privateChatInput" rows="3" placeholder="Message ਲਿਖੋ..."></textarea>
+      <div class="chat-actions">
+        <button class="primary" onclick="sendPrivateChat()">Send</button>
+        <button onclick="loadPrivateChat()">Refresh</button>
+        <button onclick="shareChatOnWhatsapp()">WhatsApp Copy/Share</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
