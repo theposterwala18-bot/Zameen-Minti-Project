@@ -44,6 +44,7 @@
       <button class="nav-pill disabled-nav" type="button"><span>🧾</span> ਹੋਰ ਟੂਲਜ਼ ▾</button>
       <div class="nav-spacer"></div>
       <button class="nav-pill small-nav" onclick="openPrivateChat()">💬 ਚੈਟ</button>
+      <button class="nav-pill small-nav owner-inbox-btn" onclick="openAdminInbox()">📥 Admin Inbox <span id="adminUnreadBadge" class="unread-badge hidden">0</span></button>
       <button class="nav-pill small-nav" type="button">🔔 ਨੋਟੀਫਿਕੇਸ਼ਨ</button>
     </nav>
 
@@ -229,6 +230,7 @@
         </div>
         <div class="help-box">Owner panel future ਵਿੱਚ real clients, chats, premium plans, reports ਅਤੇ analytics control ਕਰੇਗਾ।</div>
         <button class="primary" onclick="loadAdminStats()">Refresh Admin Stats</button>
+        <button onclick="openAdminInbox()">📥 Admin Inbox ਖੋਲ੍ਹੋ</button>
       </section>
 
       
@@ -381,6 +383,41 @@
         <button class="primary" onclick="sendPrivateChat()">Send</button>
         <button onclick="loadPrivateChat()">Refresh</button>
         <button onclick="shareChatOnWhatsapp()">WhatsApp Copy/Share</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="adminInboxModal" class="modal hidden">
+    <div class="modal-content admin-inbox-content">
+      <div class="modal-head">
+        <h2>Owner Admin Inbox</h2>
+        <button onclick="closeAdminInbox()">×</button>
+      </div>
+
+      <div class="admin-inbox-layout">
+        <aside class="admin-chat-list">
+          <div class="admin-list-head">
+            <b>Clients / Messages</b>
+            <button onclick="loadAdminInbox()">Refresh</button>
+          </div>
+          <div id="adminChatList"></div>
+        </aside>
+
+        <section class="admin-chat-panel">
+          <div id="adminSelectedClient" class="small-status">ਕਿਸੇ client ਦੀ chat select ਕਰੋ।</div>
+          <div id="adminChatWindow" class="chat-window admin-chat-window"></div>
+          <textarea id="adminReplyInput" rows="3" placeholder="Owner reply ਲਿਖੋ..."></textarea>
+          <div class="chat-actions">
+            <button class="primary" onclick="sendAdminReply()">Reply</button>
+            <button onclick="markChatRead()">Mark Read</button>
+            <button onclick="exportSelectedChat()">Export Chat</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="note-card admin-note">
+        ਨੋਟ: ਇਹ current version browser/localStorage demo ਹੈ। Real Facebook/Instagram ਵਰਗੀ saved chat ਲਈ Supabase/Firebase backend database ਲਾਜ਼ਮੀ ਹੋਵੇਗਾ, ਤਾਂ ਕਿ ਹਰ client ਦਾ message owner ਨੂੰ live show ਹੋਵੇ ਅਤੇ updates ਬਾਅਦ ਵੀ save ਰਹੇ।
       </div>
     </div>
   </div>

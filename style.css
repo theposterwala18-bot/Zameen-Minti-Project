@@ -1110,3 +1110,50 @@ main{
   height:360px;
  }
 }
+
+
+/* v18 Admin Inbox */
+.owner-inbox-btn{position:relative}
+.unread-badge{
+  background:#ff3b30;color:white;border-radius:999px;padding:2px 7px;
+  font-size:12px;margin-left:4px;
+}
+.admin-inbox-content{max-width:1120px!important;width:92vw!important}
+.admin-inbox-layout{
+  display:grid;grid-template-columns:340px 1fr;gap:18px;min-height:560px;
+}
+.admin-chat-list{
+  border:1px solid #d7eadb;border-radius:16px;background:#fbfffd;overflow:hidden;
+}
+.admin-list-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:12px;border-bottom:1px solid #d7eadb;
+}
+#adminChatList{max-height:510px;overflow:auto}
+.admin-client-row{
+  width:100%;display:grid;grid-template-columns:46px 1fr auto;gap:10px;
+  align-items:center;padding:12px;border:0!important;
+  border-bottom:1px solid #e4eee8!important;background:white!important;text-align:left;
+}
+.admin-client-row.active{background:#eef8f1!important}
+.avatar-circle{
+  width:42px;height:42px;border-radius:999px;background:#0f6b3a;color:white;
+  display:flex;align-items:center;justify-content:center;font-weight:900;
+}
+.client-row-text b{display:block;color:#064d2a}
+.client-row-text span{
+  display:block;color:#445;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.client-row-text small{color:#778;font-size:11px}
+.admin-client-row em{
+  background:#ff3b30;color:white;border-radius:999px;min-width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:800;
+}
+.admin-chat-panel{border:1px solid #d7eadb;border-radius:16px;padding:14px;background:white}
+.admin-chat-window{height:390px!important}
+#adminReplyInput{
+  width:100%;border:1px solid #cfddd5;border-radius:10px;padding:10px;
+  font-family:Arial,sans-serif;margin-top:10px;
+}
+.admin-note{margin-top:14px}
+@media(max-width:900px){.admin-inbox-layout{grid-template-columns:1fr}}

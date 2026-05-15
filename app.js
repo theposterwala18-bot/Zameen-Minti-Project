@@ -1143,3 +1143,228 @@ function resetGpsMeasurement(){
   gpsPoints = [];
   document.getElementById("gpsResult").classList.add("hidden");
 }
+
+
+// -------- v18 Admin Inbox / Owner Reply System --------
+let selectedAdminClientId = null;
+
+function getAllMembersForAdmin(){
+  return JSON.parse(localStorage.getItem("zmMembers") || "[]");
+}
+
+function getChats(){
+  return JSON.parse(localStorage.getItem("zmChats") || "{}");
+}
+
+function saveChats(chats){
+  localStorage.setItem("zmChats", JSON.stringify(chats));
+}
+
+function sendPrivateChat(){
+  const m = currentMember();
+  if(!m) return openAuthModal();
+
+  const input = document.getElementById("privateChatInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  const chats = getChats();
+  chats[m.id] = chats[m.id] || [];
+  chats[m.id].push({
+    from:"client",
+    text:text,
+    time:new Date().toISOString(),
+    unreadForOwner:true
+  });
+
+  saveChats(chats);
+  input.value = "";
+  loadPrivateChat();
+  updateAdminUnreadBadge();
+  alert("Message owner inbox ਵਿੱਚ save ਹੋ ਗਿਆ ਹੈ।");
+}
+
+function openAdminInbox(){
+  const pass = prompt("Owner password ਭਰੋ:");
+  if(pass !== "owner123"){
+    alert("Wrong owner password");
+    return;
+  }
+  document.getElementById("adminInboxModal").classList.remove("hidden");
+  loadAdminInbox();
+}
+
+function closeAdminInbox(){
+  document.getElementById("adminInboxModal").classList.add("hidden");
+}
+
+function getClientNameById(id){
+  const members = getAllMembersForAdmin();
+  return members.find(m => m.id === id) || {id:id, name:"Guest/Unknown", mobile:"", email:""};
+}
+
+function loadAdminInbox(){
+  const list = document.getElementById("adminChatList");
+  if(!list) return;
+
+  const chats = getChats();
+  const ids = Object.keys(chats);
+
+  if(ids.length === 0){
+    list.innerHTML = '<div class="chat-note">ਹਾਲੇ ਕੋਈ client message ਨਹੀਂ ਆਇਆ।</div>';
+    document.getElementById("adminChatWindow").innerHTML = "";
+    updateAdminUnreadBadge();
+    return;
+  }
+
+  ids.sort((a,b)=>{
+    const ca = chats[a] || [];
+    const cb = chats[b] || [];
+    return new Date((cb[cb.length-1]||{}).time || 0) - new Date((ca[ca.length-1]||{}).time || 0);
+  });
+
+  list.innerHTML = ids.map(id=>{
+    const member = getClientNameById(id);
+    const chat = chats[id] || [];
+    const last = chat[chat.length-1] || {};
+    const unread = chat.filter(m => m.from === "client" && m.unreadForOwner).length;
+    const initial = (member.name || "C").charAt(0).toUpperCase();
+    return `
+      <button class="admin-client-row ${selectedAdminClientId === id ? "active" : ""}" onclick="selectAdminChat('${id}')">
+        <div class="avatar-circle">${initial}</div>
+        <div class="client-row-text">
+          <b>${member.name || "Client"}</b>
+          <span>${last.text ? last.text.slice(0,55) : "No message"}</span>
+          <small>${last.time ? new Date(last.time).toLocaleString() : ""}</small>
+        </div>
+        ${unread ? `<em>${unread}</em>` : ""}
+      </button>
+    `;
+  }).join("");
+
+  updateAdminUnreadBadge();
+}
+
+function selectAdminChat(id){
+  selectedAdminClientId = id;
+  const member = getClientNameById(id);
+  document.getElementById("adminSelectedClient").innerHTML = `
+    <b>${member.name || "Client"}</b> | ${member.id}<br>
+    ${member.mobile || ""} ${member.email || ""}
+  `;
+  renderAdminChat();
+  loadAdminInbox();
+}
+
+function renderAdminChat(){
+  const win = document.getElementById("adminChatWindow");
+  const chats = getChats();
+  const list = chats[selectedAdminClientId] || [];
+
+  if(!selectedAdminClientId){
+    win.innerHTML = '<div class="chat-note">ਕਿਸੇ client ਦੀ chat select ਕਰੋ।</div>';
+    return;
+  }
+
+  win.innerHTML = list.map(m => `
+    <div class="msg ${m.from === "client" ? "client-msg" : "owner-msg"}">
+      <div>${m.text}</div>
+      <small>${new Date(m.time).toLocaleString()} ${m.unreadForOwner ? " • unread" : ""}</small>
+    </div>
+  `).join("");
+  win.scrollTop = win.scrollHeight;
+}
+
+function sendAdminReply(){
+  if(!selectedAdminClientId){
+    alert("ਪਹਿਲਾਂ client select ਕਰੋ।");
+    return;
+  }
+  const input = document.getElementById("adminReplyInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  const chats = getChats();
+  chats[selectedAdminClientId] = chats[selectedAdminClientId] || [];
+  chats[selectedAdminClientId].push({
+    from:"owner",
+    text:text,
+    time:new Date().toISOString(),
+    unreadForClient:true
+  });
+
+  saveChats(chats);
+  input.value = "";
+  renderAdminChat();
+  loadAdminInbox();
+}
+
+function markChatRead(){
+  if(!selectedAdminClientId) return;
+  const chats = getChats();
+  chats[selectedAdminClientId] = (chats[selectedAdminClientId] || []).map(m => {
+    m.unreadForOwner = false;
+    return m;
+  });
+  saveChats(chats);
+  renderAdminChat();
+  loadAdminInbox();
+  updateAdminUnreadBadge();
+}
+
+function updateAdminUnreadBadge(){
+  const badge = document.getElementById("adminUnreadBadge");
+  if(!badge) return;
+  const chats = getChats();
+  let total = 0;
+  Object.values(chats).forEach(list=>{
+    total += (list || []).filter(m => m.from === "client" && m.unreadForOwner).length;
+  });
+  if(total > 0){
+    badge.innerText = total;
+    badge.classList.remove("hidden");
+  }else{
+    badge.classList.add("hidden");
+  }
+}
+
+function exportSelectedChat(){
+  if(!selectedAdminClientId) return alert("Client select ਕਰੋ।");
+  const member = getClientNameById(selectedAdminClientId);
+  const chats = getChats()[selectedAdminClientId] || [];
+  const text = "Chat Export\\nClient: " + member.name + " (" + member.id + ")\\nMobile: " + (member.mobile || "") + "\\nEmail: " + (member.email || "") + "\\n\\n" +
+    chats.map(m => "[" + new Date(m.time).toLocaleString() + "] " + m.from + ": " + m.text).join("\\n");
+
+  const blob = new Blob([text], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = member.id + "-chat.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadPrivateChat(){
+  const m = currentMember();
+  const win = document.getElementById("privateChatWindow");
+  if(!m || !win) return;
+
+  const chats = getChats();
+  const list = chats[m.id] || [];
+  if(list.length === 0){
+    win.innerHTML = '<div class="chat-note">ਇਹ ਤੁਹਾਡੀ private chat ਹੈ। ਤੁਹਾਡੇ message ਇੱਥੇ save ਰਹਿਣਗੇ।</div>';
+    return;
+  }
+
+  win.innerHTML = list.map(x => `
+    <div class="msg ${x.from === "client" ? "client-msg" : "owner-msg"}">
+      <div>${x.text}</div>
+      <small>${new Date(x.time).toLocaleString()}</small>
+    </div>
+  `).join("");
+  win.scrollTop = win.scrollHeight;
+}
+
+setTimeout(updateAdminUnreadBadge, 600);
+setInterval(updateAdminUnreadBadge, 5000);
+

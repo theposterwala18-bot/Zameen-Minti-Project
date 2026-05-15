@@ -68,3 +68,7 @@ User-approved reference GUI implemented:
 
 ## v17 Owner Password Hidden
 Public UI no longer shows default owner password. Continue future security upgrades with real admin authentication.
+
+
+## v18 Admin Inbox Chat
+Added owner admin inbox UI with client list, unread badge, owner reply, mark read and chat export. Static/localStorage demo only; real multi-client online chat requires backend database such as Supabase/Firebase.
