@@ -64,3 +64,7 @@ User-approved reference GUI implemented:
 - Saved Reports History
 - Owner Admin Dashboard stats
 - GPS / Map Measurement placeholder
+
+
+## v17 Owner Password Hidden
+Public UI no longer shows default owner password. Continue future security upgrades with real admin authentication.

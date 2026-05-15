@@ -16,7 +16,7 @@ Punjabi/English land measurement calculator for Punjab style units.
 3. Use calculator
 
 ## Owner Settings
-Default password: `owner123`
+Default password: `••••••`
 
 You can change unit values from Owner Settings. Values are saved in browser localStorage.
 
@@ -78,3 +78,9 @@ Calculators now open from module buttons, with a Dashboard back button.
   - Marla: orange
   - Main annual theka: purple highlight
   - Installments: soft green
+
+
+## v17 Owner Password Hidden
+- Removed visible default owner password hint from the public UI.
+- Owner Settings still remain password protected.
+- Future step: real encrypted admin login with backend database.
