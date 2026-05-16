@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
-  <!-- ZAMEEN_MINTI_VERSION: Zameen Minti Project v39 | Contact: dhaliwalballi18@gmail.com -->
+  <!-- ZAMEEN_MINTI_VERSION: Zameen Minti Project v63 | Contact: dhaliwalballi18@gmail.com -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zameen Minti Calculator</title>
@@ -74,7 +74,7 @@
 
       <section id="dashboardModule" class="dashboard-module">
         <h2>ਮੁੱਖ Dashboard</h2>
-        <div class="project-lock-badge">🔒 Zameen Minti Project Locked v39 — Software/Site Update Mode</div>
+        <div class="project-lock-badge">🔒 Zameen Minti Project Locked v63 — Software/Site Update Mode</div>
         <p class="dash-intro">
           ਇਹ ਸਿਸਟਮ ਜ਼ਮੀਨ ਨਾਲ ਸੰਬੰਧਿਤ ਵੱਖ-ਵੱਖ ਕੰਮਾਂ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ।
           ਹੇਠਾਂ ਦਿੱਤੇ module ਵਿਚੋਂ ਆਪਣੀ ਲੋੜ ਮੁਤਾਬਕ option ਚੁਣੋ।
@@ -346,7 +346,15 @@
       </section>
 
       <aside class="reference-card">
-        <h3 id="referenceTitle">Land Unit Reference</h3>
+        <h3 id="referenceTitle">Land Unit Reference
+
+<div class="unit-card vishwe-card" style="background:#f3fff2;border:1px solid #57a85a;border-radius:12px;padding:10px;margin-bottom:10px;">
+<h4>ਵਿਸ਼ਵੇ</h4>
+<ul>
+
+</ul>
+</div>
+</h3>
         <ul id="referenceList"></ul>
 
         <div class="contact-card">
@@ -553,7 +561,7 @@ console.log("✅ Supabase Connected Successfully");
 
 <footer class="zm-footer-contact">
   <div>
-    <b>Zameen Minti Project v39</b>
+    <b>Zameen Minti Project v63</b>
     <p>Contact Email: <a href="mailto:dhaliwalballi18@gmail.com">dhaliwalballi18@gmail.com</a></p>
     <p>Feedback / Suggestion 2026-27</p>
   </div>
@@ -598,6 +606,19 @@ console.log("✅ Supabase Connected Successfully");
         <button onclick="applyVoiceCommand()">✅ Apply</button>
         <button onclick="clearVoiceText()">Clear</button>
       </div>
+      <div class="voice-auto-options-v47">
+        <label><input id="voiceAutoApplyV47" type="checkbox" checked> Silence ਤੋਂ ਬਾਅਦ auto result/apply ਕਰੋ</label>
+        <label>Wait Time
+          <select id="voiceSilenceDelayV47">
+            <option value="1200">1.2 sec</option>
+            <option value="1800" selected>1.8 sec</option>
+            <option value="2500">2.5 sec</option>
+            <option value="3500">3.5 sec</option>
+          </select>
+        </label>
+      </div>
+      <div id="voiceAutoStatusV47" class="voice-auto-status-v47 hidden"></div>
+
       <label>Recognized Voice Text</label>
       <textarea id="voiceTextOutput" rows="4" placeholder="ਤੁਹਾਡੀ voice ਇੱਥੇ text ਵਿੱਚ ਆਵੇਗੀ..."></textarea>
       <div id="voiceParsedPreview" class="voice-preview hidden"></div>
@@ -615,3 +636,8 @@ console.log("✅ Supabase Connected Successfully");
 
 </body>
 </html>
+
+<div class="result-item vishwe-result-box">
+<label>ਵਿਸ਼ਵੇ</label>
+<div id="vishweResult">0.000</div>
+</div>

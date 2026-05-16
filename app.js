@@ -9,6 +9,8 @@ const defaultSettings = {
   kanalVishwasian: 12,
   bighaVishwasian: 20,
   karamFeet: 5.5,
+    vishweSqft: 453.75,
+    vishweSqft: 453.75,
   ownerWhatsapp: ""
 };
 
@@ -176,10 +178,11 @@ function renderReference(){
         <li>1 Marla = ${s.marlaSqft} sq ft</li>
         <li>1 Kanal = ${s.kanalSqft} sq ft</li>
         <li>1 Acre/Killa = ${s.acreSqft} sq ft</li>
-        <li>1 Karam = ${s.karamFeet} ft</li>
+        <li>1 Karam = ${s.karamFeet} ft</li>\n        <li><b>1 ਵਿਸ਼ਵੇ = 453.75 sq ft</b></li>
       </ul></div>
       <div class="ref-section"><h4>Karam</h4><ul><li>1 Karam = ${s.karamFeet} ft</li></ul></div>
       <div class="ref-section"><h4>Gaj</h4><ul><li>Gaj = will be added later</li></ul></div>
+      <div class="ref-section vishwe-ref-section"><h4>ਵਿਸ਼ਵੇ / Vishwe</h4><ul><li>1 ਵਿਸ਼ਵੇ = 453.75 sq ft</li></ul></div>
       <div class="ref-section"><h4>Marla</h4><ul><li>1 Marla = ${s.marlaSqft} sq ft</li></ul></div>
       <div class="ref-section"><h4>Kanal</h4><ul>
         <li>1 Kanal = ${s.kanalSqft} sq ft</li>
@@ -262,6 +265,7 @@ function calculateTheka(){
   const total = (acres * acreRate) + (kanal * kanalRate) + (marla * marlaRate);
   const totalKanal = (acres * s.acreKanal) + kanal + (marla / s.kanalMarla);
   const totalMarla = (acres * s.acreMarla) + (kanal * s.kanalMarla) + marla;
+  const totalVishwe = ((acres * s.acreSqft) + (kanal * s.kanalSqft) + (marla * s.marlaSqft)) / (window.ZM_VISHWE_SQFT || 453.75);
 
   document.getElementById("result").innerHTML = `
     <h2>${t.leaseResult}</h2>
@@ -324,7 +328,7 @@ function showResult(area, formula){
   const marla = area / s.marlaSqft;
   const kanal = area / s.kanalSqft;
   const acre = area / s.acreSqft;
-  const vishve = acre * s.acreVishwasian;
+  const vishve = area / (window.ZM_VISHWE_SQFT || 453.75);
   const bigha = vishve / s.bighaVishwasian;
 
   lastResult = {area, marla, kanal, acre, vishve, bigha, formula};
@@ -335,9 +339,9 @@ function showResult(area, formula){
     <div class="result-grid">
       <div class="result-item"><span>Sq Ft</span><b>${round(area)}</b></div>
       <div class="result-item"><span>${lang === "pa" ? "ਮਰਲਾ" : "Marla"}</span><b>${round(marla)}</b></div>
+      <div class="result-item vishwe-result-item"><span>${lang === "pa" ? "ਵਿਸ਼ਵੇ" : "Vishwe"}</span><b>${round(vishve)}</b></div>
       <div class="result-item"><span>${lang === "pa" ? "ਕਨਾਲ" : "Kanal"}</span><b>${round(kanal)}</b></div>
       <div class="result-item"><span>${lang === "pa" ? "ਏਕੜ/ਕਿੱਲਾ" : "Acre/Killa"}</span><b>${round(acre)}</b></div>
-      <div class="result-item"><span>${lang === "pa" ? "ਵਿਸ਼ਵਾਸੀਆਂ" : "Vishwasian"}</span><b>${round(vishve)}</b></div>
       <div class="result-item"><span>${lang === "pa" ? "ਬਿੱਘਾ" : "Bigha"}</span><b>${round(bigha)}</b></div>
     </div>
     <br>
@@ -452,6 +456,7 @@ function calculateSeparateTheka(){
         <h3><span class="section-icon">🌐</span> ਕਨਾਲ ਦੇ ਵੇਰਵੇ</h3>
         <div class="mini-result"><span>ਕੁੱਲ ਕਨਾਲ</span><b>${round(totalKanal)}</b></div>
         <div class="mini-result"><span>ਕੁੱਲ ਮਰਲੇ</span><b>${round(totalMarla)}</b></div>
+        <div class="mini-result vishwe-result-item"><span>ਕੁੱਲ ਵਿਸ਼ਵੇ</span><b>${round(totalVishwe)}</b></div>
       </div>
 
       <div class="partition-card orange-part">
@@ -1004,6 +1009,7 @@ function calculateSale(){
   const balance = total - advance;
   const totalKanal = (acres * s.acreKanal) + kanal + (marla / s.kanalMarla);
   const totalMarla = (acres * s.acreMarla) + (kanal * s.kanalMarla) + marla;
+  const totalVishwe = ((acres * s.acreSqft) + (kanal * s.kanalSqft) + (marla * s.marlaSqft)) / (window.ZM_VISHWE_SQFT || 453.75);
 
   const box = document.getElementById("saleResult");
   box.innerHTML = `
@@ -1014,7 +1020,7 @@ function calculateSale(){
       <div class="rate-card marla-rate"><span class="round-icon">📋</span><span>1 ਮਰਲਾ Rate</span><b>₹${round(marlaRate)}</b></div>
     </div>
     <div class="theka-detail-grid">
-      <div class="partition-card blue-part"><h3>ਜ਼ਮੀਨ ਵੇਰਵਾ</h3><div class="mini-result"><span>ਕੁੱਲ ਕਨਾਲ</span><b>${round(totalKanal)}</b></div><div class="mini-result"><span>ਕੁੱਲ ਮਰਲੇ</span><b>${round(totalMarla)}</b></div></div>
+      <div class="partition-card blue-part"><h3>ਜ਼ਮੀਨ ਵੇਰਵਾ</h3><div class="mini-result"><span>ਕੁੱਲ ਕਨਾਲ</span><b>${round(totalKanal)}</b></div><div class="mini-result"><span>ਕੁੱਲ ਮਰਲੇ</span><b>${round(totalMarla)}</b></div><div class="mini-result vishwe-result-item"><span>ਕੁੱਲ ਵਿਸ਼ਵੇ</span><b>${round(totalVishwe)}</b></div></div>
       <div class="partition-card orange-part"><h3>Payment</h3><div class="mini-result"><span>Advance / Token</span><b>₹${round(advance)}</b></div><div class="mini-result"><span>Balance</span><b>₹${round(balance)}</b></div></div>
       <div class="main-total-card"><h3>ਕੁੱਲ Sale Value</h3><div class="total-inner"><span>Total Amount</span><b>₹${round(total)}</b><small>Sale/Purchase estimate</small></div></div>
     </div>
@@ -1839,7 +1845,7 @@ function calculateMapPolygonArea(){
   const marla = sqFt / s.marlaSqft;
   const kanal = sqFt / s.kanalSqft;
   const acre = sqFt / s.acreSqft;
-  const vishve = acre * (s.acreVishwasian || 96);
+  const vishve = sqFt / (window.ZM_VISHWE_SQFT || 453.75);
 
   const box = document.getElementById("gpsResult");
   box.innerHTML = `
@@ -1857,9 +1863,9 @@ function calculateMapPolygonArea(){
     <div class="gps-stat-grid">
       <div class="gps-stat"><span>Square Feet</span><b>${round(sqFt)}</b></div>
       <div class="gps-stat"><span>ਮਰਲੇ</span><b>${round(marla)}</b></div>
+      <div class="gps-stat vishwe-result-item"><span>ਵਿਸ਼ਵੇ</span><b>${round(vishve)}</b></div>
       <div class="gps-stat"><span>ਕਨਾਲ</span><b>${round(kanal)}</b></div>
       <div class="gps-stat"><span>ਏਕੜ/ਕਿੱਲਾ</span><b>${round(acre)}</b></div>
-      <div class="gps-stat"><span>ਵਿਸ਼ਵੇ</span><b>${round(vishve)}</b></div>
       <div class="gps-stat"><span>Sq Meter</span><b>${round(sqMeters)}</b></div>
     </div>
 
@@ -2528,7 +2534,7 @@ document.addEventListener("click", function(e){
 
 
 // =========================================================
-// Zameen Minti Project v39 - Multilingual Voice Assistant
+// Zameen Minti Project v63 - Multilingual Voice Assistant
 // =========================================================
 let zmVoiceRecognition = null;
 let zmVoiceListening = false;
@@ -2657,3 +2663,644 @@ document.addEventListener("DOMContentLoaded", function(){
   const txt = document.getElementById("voiceTextOutput");
   if(txt) txt.addEventListener("input", previewVoiceCommand);
 });
+
+
+// ======================================================
+// Zameen Minti Project v63 - Clean Voice Auto Detect
+// Based on v39 stable buttons. No Chat/Admin binding changes.
+// ======================================================
+let zmVoiceAutoTimerV47 = null;
+let zmVoiceFinalTextV47 = "";
+
+function zmVoiceStatusV47(text, mode){
+  const el = document.getElementById("voiceAutoStatusV47");
+  if(!el) return;
+  el.innerHTML = text;
+  el.className = "voice-auto-status-v47 " + (mode || "");
+  el.classList.remove("hidden");
+}
+
+function zmVoiceLangV47(){
+  const selected = document.getElementById("voiceLangSelect")?.value || "pa-IN";
+  if(selected !== "auto") return selected;
+  const nav = navigator.language || "en-IN";
+  if(nav.toLowerCase().startsWith("pa")) return "pa-IN";
+  if(nav.toLowerCase().startsWith("hi")) return "hi-IN";
+  return "en-IN";
+}
+
+function zmScheduleVoiceAutoApplyV47(){
+  clearTimeout(zmVoiceAutoTimerV47);
+  if(!document.getElementById("voiceAutoApplyV47")?.checked) return;
+  const delay = parseInt(document.getElementById("voiceSilenceDelayV47")?.value || "1800", 10);
+  zmVoiceStatusV47("⏳ ਚੁੱਪ ਹੋਣ ਦੀ waiting... " + (delay/1000).toFixed(1) + " sec ਬਾਅਦ result/apply ਹੋਵੇਗਾ।", "waiting");
+  zmVoiceAutoTimerV47 = setTimeout(() => {
+    const text = document.getElementById("voiceTextOutput")?.value || "";
+    if(text.trim()){
+      if(typeof previewVoiceCommand === "function") previewVoiceCommand();
+      zmVoiceStatusV47("✅ Command complete — result/apply ਕਰ ਰਿਹਾ ਹੈ।", "ok");
+      if(typeof applyVoiceCommand === "function") applyVoiceCommand();
+    }
+  }, delay);
+}
+
+// Override only start/stop voice; old modal open/close remains from v39.
+const zmOldStartVoiceAssistantV47 = window.startVoiceAssistant;
+window.startVoiceAssistant = function(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const httpsOk = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  if(!SR){
+    alert("Voice ਇਸ browser ਵਿੱਚ supported ਨਹੀਂ। Chrome/Edge ਜਾਂ Android Chrome ਤੇ try ਕਰੋ। Text manually ਲਿਖ ਕੇ Apply ਕਰ ਸਕਦੇ ਹੋ।");
+    return;
+  }
+  if(!httpsOk){
+    alert("Voice ਲਈ HTTPS live site ਚਾਹੀਦੀ ਹੈ। Netlify live URL ਤੇ open ਕਰੋ, local file ਤੋਂ ਨਹੀਂ।");
+    return;
+  }
+
+  try{ if(window.zmVoiceRecognition && window.zmVoiceListening) window.zmVoiceRecognition.stop(); }catch(e){}
+  clearTimeout(zmVoiceAutoTimerV47);
+  zmVoiceFinalTextV47 = "";
+
+  const lang = zmVoiceLangV47();
+  const output = document.getElementById("voiceTextOutput");
+  const btn = document.getElementById("voiceStartBtn");
+
+  window.zmVoiceRecognition = new SR();
+  window.zmVoiceRecognition.lang = lang;
+  window.zmVoiceRecognition.interimResults = true;
+  window.zmVoiceRecognition.continuous = false;
+  window.zmVoiceRecognition.maxAlternatives = 3;
+
+  zmVoiceStatusV47("🎙️ Listening... Language: " + lang + ". Command ਬੋਲੋ।", "listening");
+
+  window.zmVoiceRecognition.onstart = () => {
+    window.zmVoiceListening = true;
+    if(btn) btn.innerText = "🎙️ Listening...";
+  };
+
+  window.zmVoiceRecognition.onresult = (event) => {
+    let interim = "";
+    let finalText = "";
+    for(let i = event.resultIndex; i < event.results.length; i++){
+      const transcript = event.results[i][0].transcript;
+      if(event.results[i].isFinal) finalText += transcript;
+      else interim += transcript;
+    }
+
+    if(finalText.trim()) zmVoiceFinalTextV47 = (zmVoiceFinalTextV47 + " " + finalText).trim();
+    const combined = (zmVoiceFinalTextV47 + " " + interim).trim();
+
+    if(output){
+      output.value = combined;
+      if(typeof previewVoiceCommand === "function") previewVoiceCommand();
+    }
+
+    clearTimeout(zmVoiceAutoTimerV47);
+    if(finalText.trim()){
+      zmScheduleVoiceAutoApplyV47();
+    }else{
+      zmVoiceStatusV47("🎙️ ਸੁਣ ਰਿਹਾ ਹੈ... ਬੋਲਣਾ ਖਤਮ ਕਰੋ।", "listening");
+    }
+  };
+
+  window.zmVoiceRecognition.onerror = (e) => {
+    zmVoiceStatusV47("⚠️ Voice error: " + e.error + ". ਦੁਬਾਰਾ Listen click ਕਰੋ।", "warn");
+  };
+
+  window.zmVoiceRecognition.onend = () => {
+    window.zmVoiceListening = false;
+    if(btn) btn.innerText = "🎙️ Start Listening";
+    const text = output?.value || "";
+    if(text.trim()) zmScheduleVoiceAutoApplyV47();
+    else zmVoiceStatusV47("Ready. New command ਲਈ Listen ਦੁਬਾਰਾ click ਕਰੋ।", "ok");
+  };
+
+  window.zmVoiceRecognition.start();
+};
+
+window.stopVoiceAssistant = function(){
+  clearTimeout(zmVoiceAutoTimerV47);
+  try{ if(window.zmVoiceRecognition) window.zmVoiceRecognition.stop(); }catch(e){}
+  window.zmVoiceListening = false;
+  const btn = document.getElementById("voiceStartBtn");
+  if(btn) btn.innerText = "🎙️ Start Listening";
+  zmVoiceStatusV47("⏹ Stopped. New command ਲਈ Listen ਦੁਬਾਰਾ click ਕਰੋ।", "ok");
+};
+
+const zmOldApplyVoiceCommandV47 = window.applyVoiceCommand;
+window.applyVoiceCommand = function(){
+  clearTimeout(zmVoiceAutoTimerV47);
+  const res = typeof zmOldApplyVoiceCommandV47 === "function" ? zmOldApplyVoiceCommandV47() : undefined;
+  zmVoiceFinalTextV47 = "";
+  setTimeout(() => zmVoiceStatusV47("✅ Command applied. New command ਲਈ Listen ਦੁਬਾਰਾ click ਕਰੋ।", "ok"), 500);
+  return res;
+};
+
+
+// ======================================================
+// Zameen Minti Project v63 - Vishwe Sq Ft Added
+// 
+// ======================================================
+const ZM_VISHWE_SQFT_V48 = (window.ZM_VISHWE_SQFT || 453.75);
+
+function convertSqftWithVishweV48(sqft){
+  const area = Number(sqft) || 0;
+  return {
+    sqft: area,
+    marla: area / 272.25,
+    kanal: area / 5445,
+    acre: area / 43560,
+    vishwe: area / ZM_VISHWE_SQFT_V48,
+    bigha: (area / ZM_VISHWE_SQFT_V48) / 20
+  };
+}
+
+window.zmConvertSqft = convertSqftWithVishweV48;
+window.ZM_VISHWE_SQFT = ZM_VISHWE_SQFT_V48;
+
+document.addEventListener("DOMContentLoaded", function(){
+  // Add reference line dynamically if not already visible
+  if(document.body && !document.body.innerText.includes("")){
+    const sections = Array.from(document.querySelectorAll(".reference-card, aside, .sidebar-card, .unit-reference, body"));
+    for(const el of sections){
+      const txt = el.innerText || "";
+      if(txt.includes("Sq Ft") || txt.includes("ਮੁੱਖ ਮਾਪ") || txt.includes("ਬਿੱਘਾ")){
+        const ul = el.querySelector("ul");
+        if(ul){
+          const li = document.createElement("li");
+          li.textContent = "";
+          ul.appendChild(li);
+          break;
+        }
+      }
+    }
+  }
+});
+
+
+// =============================
+// Zameen Minti Project v63
+// Vishwe Support Added
+// =============================
+const VISHWE_SQFT_V49 = (window.ZM_VISHWE_SQFT || 453.75);
+
+function zmUpdateVishweValue(areaSqft){
+    try{
+        const vishwe = Number(areaSqft || 0) / VISHWE_SQFT_V49;
+        const el = document.getElementById("vishweResult");
+        if(el){
+            el.innerText = vishwe.toFixed(3);
+        }
+    }catch(e){}
+}
+
+// Auto watch result updates
+setInterval(()=>{
+    try{
+        let sqft = 0;
+        const sqftEl = document.querySelector("#sqftResult, .sqftResult, [data-sqft]");
+        if(sqftEl){
+            sqft = parseFloat((sqftEl.innerText || sqftEl.value || "0").replace(/,/g,'')) || 0;
+        }
+        zmUpdateVishweValue(sqft);
+    }catch(err){}
+}, 700);
+
+
+
+// v54 Vishwe safety check
+document.addEventListener("DOMContentLoaded", function(){
+  setTimeout(function(){
+    const list = document.getElementById("referenceList");
+    if(list && !list.innerText.includes("1 ਵਿਸ਼ਵੇ = 453.75 sq ft")){
+      const gaj = Array.from(list.querySelectorAll(".ref-section")).find(x => (x.innerText || "").includes("Gaj") || (x.innerText || "").includes("ਗਜ"));
+      const div = document.createElement("div");
+      div.className = "ref-section vishwe-ref-section";
+      div.innerHTML = "<h4>ਵਿਸ਼ਵੇ / Vishwe</h4><ul><li>1 ਵਿਸ਼ਵੇ = 453.75 sq ft</li></ul>";
+      if(gaj) gaj.insertAdjacentElement("afterend", div); else list.prepend(div);
+    }
+  }, 400);
+});
+
+
+// v55 Vishwe also in top Sq Ft main reference box
+document.addEventListener("DOMContentLoaded", function(){
+  setTimeout(function(){
+    const list = document.getElementById("referenceList");
+    if(!list) return;
+    const first = list.querySelector(".ref-section");
+    if(first && !first.innerText.includes("1 ਵਿਸ਼ਵੇ = 453.75 sq ft")){
+      const ul = first.querySelector("ul");
+      if(ul){
+        const li = document.createElement("li");
+        li.innerHTML = "<b>1 ਵਿਸ਼ਵੇ = 453.75 sq ft</b>";
+        ul.appendChild(li);
+      }
+    }
+  }, 500);
+});
+
+
+// ======================================================
+// Zameen Minti Project v63 - Stable Owner Vishwe Setting
+// No heavy observer. Owner Settings button remains visible.
+// ======================================================
+(function(){
+  const DEFAULT_VISHWE = (window.ZM_VISHWE_SQFT || 453.75);
+
+  function getVishweValue(){
+    try{
+      const s = JSON.parse(localStorage.getItem("zmSettings") || "{}");
+      const v = parseFloat(s.vishweSqft || localStorage.getItem("zmVishweSqft") || DEFAULT_VISHWE);
+      return isFinite(v) && v > 0 ? v : DEFAULT_VISHWE;
+    }catch(e){
+      const v = parseFloat(localStorage.getItem("zmVishweSqft") || DEFAULT_VISHWE);
+      return isFinite(v) && v > 0 ? v : DEFAULT_VISHWE;
+    }
+  }
+
+  function saveVishweValue(v){
+    const val = parseFloat(v);
+    const finalVal = isFinite(val) && val > 0 ? val : DEFAULT_VISHWE;
+    localStorage.setItem("zmVishweSqft", String(finalVal));
+    try{
+      const s = JSON.parse(localStorage.getItem("zmSettings") || "{}");
+      s.vishweSqft = finalVal;
+      localStorage.setItem("zmSettings", JSON.stringify(s));
+    }catch(e){}
+    window.ZM_VISHWE_SQFT = finalVal;
+    return finalVal;
+  }
+
+  window.getVishweSqft = getVishweValue;
+  window.setVishweSqft = saveVishweValue;
+  window.ZM_VISHWE_SQFT = getVishweValue();
+
+  function ensureOwnerSettingsButton(){
+    if(Array.from(document.querySelectorAll("button")).some(b => (b.innerText || "").includes("Owner Settings"))) return;
+    const lang = document.querySelector("#langSelect, select");
+    const btn = document.createElement("button");
+    btn.className = "btn owner-settings-top-btn";
+    btn.textContent = "Owner Settings";
+    btn.onclick = function(){ 
+      if(typeof openOwnerSettings === "function") openOwnerSettings(); 
+    };
+    if(lang && lang.parentElement) lang.parentElement.appendChild(btn);
+  }
+
+  function findOwnerModal(){
+    return Array.from(document.querySelectorAll(".modal-content, .modal, div"))
+      .find(el => {
+        const t = el.innerText || "";
+        return t.includes("Owner Settings") && t.includes("1 Karam Feet");
+      });
+  }
+
+  function addFieldToOwnerModal(){
+    const modal = findOwnerModal();
+    if(!modal) return;
+    if(modal.querySelector("#settingVishweSqft")){
+      modal.querySelector("#settingVishweSqft").value = getVishweValue();
+      return;
+    }
+
+    const field = document.createElement("div");
+    field.className = "form-field v60-vishwe-setting-field";
+    field.innerHTML = '<label>1 ਵਿਸ਼ਵੇ Sq Ft</label><input id="settingVishweSqft" type="number" step="0.01" value="'+getVishweValue()+'">';
+
+    const karam = modal.querySelector("#settingKaramFeet");
+    if(karam){
+      (karam.closest(".form-field") || karam.parentElement).insertAdjacentElement("afterend", field);
+    }else{
+      const ownerWhatsapp = Array.from(modal.querySelectorAll("label")).find(l => (l.innerText || "").includes("Owner WhatsApp"));
+      if(ownerWhatsapp){
+        (ownerWhatsapp.closest(".form-field") || ownerWhatsapp.parentElement).insertAdjacentElement("beforebegin", field);
+      }else{
+        const save = Array.from(modal.querySelectorAll("button")).find(b => (b.innerText || "").includes("Save"));
+        if(save) save.insertAdjacentElement("beforebegin", field);
+      }
+    }
+
+    const input = field.querySelector("#settingVishweSqft");
+    input.addEventListener("input", function(){
+      saveVishweValue(this.value);
+      updateVishweReferenceLine();
+    });
+  }
+
+  function updateVishweReferenceLine(){
+    const val = getVishweValue();
+    const ref = document.getElementById("referenceList");
+    if(!ref) return;
+
+    // top main line
+    const first = ref.querySelector(".ref-section");
+    if(first){
+      let li = Array.from(first.querySelectorAll("li")).find(x => (x.innerText || "").includes("ਵਿਸ਼ਵੇ"));
+      if(li) li.innerHTML = "<b>1 ਵਿਸ਼ਵੇ = "+val+" sq ft</b>";
+    }
+
+    // separate Vishwe box
+    const vbox = ref.querySelector(".vishwe-ref-section");
+    if(vbox){
+      const title = vbox.querySelector("h4");
+      if(title) title.textContent = (typeof currentLang !== "undefined" && currentLang !== "pa") ? "Vishwe" : "ਵਿਸ਼ਵੇ";
+      const li = vbox.querySelector("li");
+      if(li) li.textContent = "1 ਵਿਸ਼ਵੇ = "+val+" sq ft";
+    }
+  }
+
+  // Hook existing open/save/reset once, without repeated observers
+  const oldOpen = window.openOwnerSettings;
+  if(typeof oldOpen === "function"){
+    window.openOwnerSettings = function(){
+      const res = oldOpen.apply(this, arguments);
+      setTimeout(function(){
+        addFieldToOwnerModal();
+        const input = document.getElementById("settingVishweSqft");
+        if(input) input.value = getVishweValue();
+      }, 100);
+      return res;
+    };
+  }
+
+  const oldSave = window.saveSettings;
+  if(typeof oldSave === "function"){
+    window.saveSettings = function(){
+      const input = document.getElementById("settingVishweSqft");
+      if(input) saveVishweValue(input.value);
+      const res = oldSave.apply(this, arguments);
+      setTimeout(updateVishweReferenceLine, 100);
+      return res;
+    };
+  }
+
+  const oldReset = window.resetSettings;
+  if(typeof oldReset === "function"){
+    window.resetSettings = function(){
+      const res = oldReset.apply(this, arguments);
+      saveVishweValue(DEFAULT_VISHWE);
+      setTimeout(function(){
+        const input = document.getElementById("settingVishweSqft");
+        if(input) input.value = DEFAULT_VISHWE;
+        updateVishweReferenceLine();
+      }, 100);
+      return res;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    ensureOwnerSettingsButton();
+    updateVishweReferenceLine();
+    setTimeout(ensureOwnerSettingsButton, 400);
+    setTimeout(updateVishweReferenceLine, 600);
+  });
+})();
+
+
+// ======================================================
+// Zameen Minti Project v63 - Owner Settings 1 Vishwe Sq Ft Field
+// Reliable visible field inside Owner Settings modal.
+// ======================================================
+(function(){
+  const DEFAULT_VISHWE_SQFT = (window.ZM_VISHWE_SQFT || 453.75);
+
+  function readVishweSqft(){
+    try{
+      const settings = JSON.parse(localStorage.getItem("zmSettings") || "{}");
+      const v = parseFloat(settings.vishweSqft || localStorage.getItem("zmVishweSqft") || DEFAULT_VISHWE_SQFT);
+      return isFinite(v) && v > 0 ? v : DEFAULT_VISHWE_SQFT;
+    }catch(e){
+      const v = parseFloat(localStorage.getItem("zmVishweSqft") || DEFAULT_VISHWE_SQFT);
+      return isFinite(v) && v > 0 ? v : DEFAULT_VISHWE_SQFT;
+    }
+  }
+
+  function saveVishweSqft(v){
+    const val = parseFloat(v);
+    const finalVal = isFinite(val) && val > 0 ? val : DEFAULT_VISHWE_SQFT;
+    localStorage.setItem("zmVishweSqft", String(finalVal));
+    try{
+      const settings = JSON.parse(localStorage.getItem("zmSettings") || "{}");
+      settings.vishweSqft = finalVal;
+      localStorage.setItem("zmSettings", JSON.stringify(settings));
+    }catch(e){}
+    window.ZM_VISHWE_SQFT = finalVal;
+    return finalVal;
+  }
+
+  window.getVishweSqft = readVishweSqft;
+  window.setVishweSqft = saveVishweSqft;
+  window.ZM_VISHWE_SQFT = readVishweSqft();
+
+  function ownerModalContainer(){
+    return Array.from(document.querySelectorAll(".modal-content, .modal, body > div"))
+      .find(el => {
+        const t = el.innerText || "";
+        return t.includes("Owner Settings") && t.includes("1 Karam Feet") && t.includes("Save Settings");
+      });
+  }
+
+  function insertVishweField(){
+    const modal = ownerModalContainer();
+    if(!modal) return false;
+
+    let existing = modal.querySelector("#settingVishweSqft");
+    if(existing){
+      existing.value = readVishweSqft();
+      return true;
+    }
+
+    const karamInput = modal.querySelector("#settingKaramFeet");
+    const field = document.createElement("div");
+    field.className = "form-field v61-vishwe-owner-field";
+    field.innerHTML = `
+      <label>1 Vishwe Sq Ft</label>
+      <input id="settingVishweSqft" type="number" step="0.01" min="0" value="${readVishweSqft()}">
+    `;
+
+    if(karamInput){
+      const karamField = karamInput.closest(".form-field") || karamInput.parentElement;
+      karamField.insertAdjacentElement("afterend", field);
+    }else{
+      const whatsappLabel = Array.from(modal.querySelectorAll("label"))
+        .find(l => (l.innerText || "").includes("Owner WhatsApp"));
+      if(whatsappLabel){
+        (whatsappLabel.closest(".form-field") || whatsappLabel.parentElement).insertAdjacentElement("beforebegin", field);
+      }else{
+        modal.appendChild(field);
+      }
+    }
+
+    const input = field.querySelector("#settingVishweSqft");
+    input.addEventListener("input", function(){
+      saveVishweSqft(this.value);
+      updateVishweReferencesV61();
+    });
+
+    return true;
+  }
+
+  function updateVishweReferencesV61(){
+    const val = readVishweSqft();
+    const ref = document.getElementById("referenceList");
+    if(!ref) return;
+
+    // top Sq Ft box line
+    const top = ref.querySelector(".ref-section");
+    if(top){
+      let line = Array.from(top.querySelectorAll("li")).find(li => (li.innerText || "").includes("ਵਿਸ਼ਵੇ"));
+      if(line) line.innerHTML = "<b>1 ਵਿਸ਼ਵੇ = " + val + " sq ft</b>";
+    }
+
+    // separate Vishwe box
+    const vbox = ref.querySelector(".vishwe-ref-section");
+    if(vbox){
+      const li = vbox.querySelector("li");
+      if(li) li.textContent = "1 ਵਿਸ਼ਵੇ = " + val + " sq ft";
+    }
+  }
+
+  function hookSaveReset(){
+    const modal = ownerModalContainer();
+    if(!modal) return;
+    modal.querySelectorAll("button").forEach(btn => {
+      const t = btn.innerText || "";
+      if(t.includes("Save Settings") && !btn.dataset.v61VishweSave){
+        btn.dataset.v61VishweSave = "1";
+        btn.addEventListener("click", function(){
+          const input = modal.querySelector("#settingVishweSqft");
+          if(input) saveVishweSqft(input.value);
+          setTimeout(updateVishweReferencesV61, 100);
+        }, true);
+      }
+      if(t.includes("Reset Default") && !btn.dataset.v61VishweReset){
+        btn.dataset.v61VishweReset = "1";
+        btn.addEventListener("click", function(){
+          saveVishweSqft(DEFAULT_VISHWE_SQFT);
+          setTimeout(function(){
+            const input = modal.querySelector("#settingVishweSqft");
+            if(input) input.value = DEFAULT_VISHWE_SQFT;
+            updateVishweReferencesV61();
+          }, 100);
+        }, true);
+      }
+    });
+  }
+
+  // Keep original owner settings, but after it opens, insert field.
+  const oldOpenOwnerSettings = window.openOwnerSettings;
+  if(typeof oldOpenOwnerSettings === "function"){
+    window.openOwnerSettings = function(){
+      const result = oldOpenOwnerSettings.apply(this, arguments);
+      setTimeout(function(){
+        insertVishweField();
+        hookSaveReset();
+      }, 80);
+      setTimeout(function(){
+        insertVishweField();
+        hookSaveReset();
+      }, 250);
+      return result;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    updateVishweReferencesV61();
+    document.addEventListener("click", function(){
+      setTimeout(function(){
+        insertVishweField();
+        hookSaveReset();
+      }, 120);
+    }, true);
+  });
+})();
+
+
+// ======================================================
+// Zameen Minti Project v63 - Vishwe Owner Field Layout Fix
+// Keep field same size as other Owner Settings fields.
+// ======================================================
+(function(){
+  function fixVishweFieldLayoutV62(){
+    const input = document.getElementById("settingVishweSqft");
+    if(!input) return;
+
+    const field = input.closest(".form-field") || input.parentElement;
+    if(!field) return;
+
+    field.classList.add("v62-vishwe-owner-field");
+    field.style.gridColumn = "auto";
+    field.style.width = "100%";
+
+    const label = field.querySelector("label");
+    if(label) label.textContent = "1 Vishwe Sq Ft";
+
+    const modal = field.closest(".modal-content, .modal") || document.body;
+    const karam = modal.querySelector("#settingKaramFeet");
+    if(karam){
+      const karamField = karam.closest(".form-field") || karam.parentElement;
+      if(karamField && field.previousElementSibling !== karamField){
+        karamField.insertAdjacentElement("afterend", field);
+      }
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(fixVishweFieldLayoutV62, 150);
+    document.addEventListener("click", function(){
+      setTimeout(fixVishweFieldLayoutV62, 150);
+      setTimeout(fixVishweFieldLayoutV62, 400);
+    }, true);
+  });
+})();
+
+
+// ======================================================
+// Zameen Minti Project v63 - Actual Vishwe Field Size Fix
+// Small layout-only fix: make 1 Vishwe Sq Ft same size as other fields.
+// ======================================================
+(function(){
+  function fixVishweFieldV63(){
+    const input = document.getElementById("settingVishweSqft");
+    if(!input) return;
+
+    const field = input.closest(".form-field") || input.parentElement;
+    const modal = input.closest(".modal-content, .modal");
+    if(!field || !modal) return;
+
+    field.classList.add("v63-vishwe-field-fixed");
+
+    // Move after 1 Karam Feet field if possible.
+    const karamInput = modal.querySelector("#settingKaramFeet");
+    if(karamInput){
+      const karamField = karamInput.closest(".form-field") || karamInput.parentElement;
+      if(karamField && karamField.nextElementSibling !== field){
+        karamField.insertAdjacentElement("afterend", field);
+      }
+    }
+
+    // Force exact visual size like other half-width fields.
+    field.style.gridColumn = "auto";
+    field.style.width = "calc(50% - 10px)";
+    field.style.maxWidth = "calc(50% - 10px)";
+    field.style.display = "inline-block";
+    field.style.verticalAlign = "top";
+    field.style.marginRight = "16px";
+
+    input.style.width = "100%";
+    input.style.boxSizing = "border-box";
+
+    const label = field.querySelector("label");
+    if(label) label.textContent = "1 Vishwe Sq Ft";
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(fixVishweFieldV63, 100);
+    document.addEventListener("click", function(){
+      setTimeout(fixVishweFieldV63, 80);
+      setTimeout(fixVishweFieldV63, 250);
+    }, true);
+  });
+})();

@@ -1,4 +1,5 @@
-Zameen Minti Project v39
+Zameen Minti Project v63
 Contact: dhaliwalballi18@gmail.com
 Feedback / Suggestion 2026-27
-Feature: Mobile first + email/overlap fix
+
+Small fix only: 1 Vishwe Sq Ft Owner Settings field forced to half-width like other fields.

@@ -122,7 +122,7 @@ Added map layer modes: Street, Satellite, Hybrid, and Topo. Satellite uses free 
 Added Supabase config, integration layer, SQL schema, profiles/messages/reports/land_records/visits tables, RLS policies, realtime message subscription, and cloud-ready auth/chat/report overrides. User must create Supabase project and paste URL/anon key.
 
 
-## Zameen Minti Project v36
+## Zameen Minti Project v63
 - Visible version strip added to site UI.
 - Footer contact added.
 - Contact Email: dhaliwalballi18@gmail.com
@@ -140,3 +140,35 @@ Added multilingual voice assistant using browser SpeechRecognition. Supports Pun
 
 ## v39 Mobile first + email/overlap fix
 Corrected contact email to dhaliwalballi18@gmail.com. Fixed header/account button overlap. Added stronger mobile-first app layout while preserving working features.
+
+
+## v47 Clean From v39
+Rebuilt from stable v39 button behavior. Removed v40-v46 modal-router style changes by using v39 as base. Added only clean voice auto-detect/auto-result features and actual Supabase config. Chat/Admin/Voice button bindings remain v39 stable.
+
+
+## v49 Vishwe Sq Ft Added
+Added unit reference: . Added global conversion helper zmConvertSqft so all future/result modules can calculate sq ft, marla, kanal, acre/killa, vishwe and bigha consistently.
+
+
+## v54 Clean Actual Vishwe Fix
+Patched actual app.js renderReference() and showResult() templates. Vishwe is now generated in reference list between Gaj and Marla, and in total area result after Marla. Also added to GPS, Theka/Sale total details.
+
+
+## v55 Vishwe Top Sq Ft Reference
+Added 1 ਵਿਸ਼ਵੇ = 453.75 sq ft inside top Sq Ft ਮੁੱਖ ਮਾਪ reference box, while keeping separate highlighted Vishwe box between Gaj and Marla.
+
+
+## v60 Stable Owner Button Vishwe Setting
+Rebuilt from stable v55 base to avoid v59 hang. Restored Owner Settings button and added lightweight Owner Settings-only 1 ਵਿਸ਼ਵੇ Sq Ft field. Removed heavy MutationObserver logic.
+
+
+## v61 Owner Settings Vishwe Field
+Added reliable dynamic field insertion inside Owner Settings modal after 1 Karam Feet: 1 Vishwe Sq Ft. Value saves in localStorage/zmSettings and updates Vishwe reference lines.
+
+
+## v62 Vishwe Owner Field Layout Fix
+Small layout-only fix. 1 Vishwe Sq Ft field is moved after 1 Karam Feet and styled same size as other Owner Settings fields. No module logic changed.
+
+
+## v63 Actual Vishwe Field Size Fix
+Small layout-only fix. Forced 1 Vishwe Sq Ft field to half-width like the other Owner Settings fields and moved it after 1 Karam Feet.
