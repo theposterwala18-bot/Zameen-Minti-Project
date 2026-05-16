@@ -1,5 +1,5 @@
-Zameen Minti Project v63
+Zameen Minti Project v64
 Contact: dhaliwalballi18@gmail.com
 Feedback / Suggestion 2026-27
 
-Small fix only: 1 Vishwe Sq Ft Owner Settings field forced to half-width like other fields.
+Fix: Owner Settings button force-visible for GitHub Pages. No module logic changed.

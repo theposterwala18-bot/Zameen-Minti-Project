@@ -1,4 +1,4 @@
-Zameen Minti Project v63 - Supabase Ready
+Zameen Minti Project v64 - Supabase Ready
 
 Files added:
 1. supabase_config.js
@@ -26,7 +26,7 @@ What this prepares:
 
 
 
-## Zameen Minti Project v63
+## Zameen Minti Project v64
 - Visible version strip added to site UI.
 - Footer contact added.
 - Contact Email: dhaliwalballi18@gmail.com

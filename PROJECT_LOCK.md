@@ -122,7 +122,7 @@ Added map layer modes: Street, Satellite, Hybrid, and Topo. Satellite uses free 
 Added Supabase config, integration layer, SQL schema, profiles/messages/reports/land_records/visits tables, RLS policies, realtime message subscription, and cloud-ready auth/chat/report overrides. User must create Supabase project and paste URL/anon key.
 
 
-## Zameen Minti Project v63
+## Zameen Minti Project v64
 - Visible version strip added to site UI.
 - Footer contact added.
 - Contact Email: dhaliwalballi18@gmail.com
@@ -172,3 +172,7 @@ Small layout-only fix. 1 Vishwe Sq Ft field is moved after 1 Karam Feet and styl
 
 ## v63 Actual Vishwe Field Size Fix
 Small layout-only fix. Forced 1 Vishwe Sq Ft field to half-width like the other Owner Settings fields and moved it after 1 Karam Feet.
+
+
+## v64 Force Owner Settings Button Visible
+GitHub Pages fix: Owner Settings button is dynamically inserted near language selector and forced visible. No module/calculation logic changed.

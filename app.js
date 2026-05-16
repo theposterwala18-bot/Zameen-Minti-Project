@@ -2534,7 +2534,7 @@ document.addEventListener("click", function(e){
 
 
 // =========================================================
-// Zameen Minti Project v63 - Multilingual Voice Assistant
+// Zameen Minti Project v64 - Multilingual Voice Assistant
 // =========================================================
 let zmVoiceRecognition = null;
 let zmVoiceListening = false;
@@ -2666,7 +2666,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Clean Voice Auto Detect
+// Zameen Minti Project v64 - Clean Voice Auto Detect
 // Based on v39 stable buttons. No Chat/Admin binding changes.
 // ======================================================
 let zmVoiceAutoTimerV47 = null;
@@ -2799,7 +2799,7 @@ window.applyVoiceCommand = function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Vishwe Sq Ft Added
+// Zameen Minti Project v64 - Vishwe Sq Ft Added
 // 
 // ======================================================
 const ZM_VISHWE_SQFT_V48 = (window.ZM_VISHWE_SQFT || 453.75);
@@ -2840,7 +2840,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // =============================
-// Zameen Minti Project v63
+// Zameen Minti Project v64
 // Vishwe Support Added
 // =============================
 const VISHWE_SQFT_V49 = (window.ZM_VISHWE_SQFT || 453.75);
@@ -2903,7 +2903,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Stable Owner Vishwe Setting
+// Zameen Minti Project v64 - Stable Owner Vishwe Setting
 // No heavy observer. Owner Settings button remains visible.
 // ======================================================
 (function(){
@@ -3060,7 +3060,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Owner Settings 1 Vishwe Sq Ft Field
+// Zameen Minti Project v64 - Owner Settings 1 Vishwe Sq Ft Field
 // Reliable visible field inside Owner Settings modal.
 // ======================================================
 (function(){
@@ -3219,7 +3219,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Vishwe Owner Field Layout Fix
+// Zameen Minti Project v64 - Vishwe Owner Field Layout Fix
 // Keep field same size as other Owner Settings fields.
 // ======================================================
 (function(){
@@ -3258,7 +3258,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v63 - Actual Vishwe Field Size Fix
+// Zameen Minti Project v64 - Actual Vishwe Field Size Fix
 // Small layout-only fix: make 1 Vishwe Sq Ft same size as other fields.
 // ======================================================
 (function(){
@@ -3302,5 +3302,62 @@ document.addEventListener("DOMContentLoaded", function(){
       setTimeout(fixVishweFieldV63, 80);
       setTimeout(fixVishweFieldV63, 250);
     }, true);
+  });
+})();
+
+
+// ======================================================
+// Zameen Minti Project v64 - Force Owner Settings Button Visible
+// GitHub Pages fix: button always appears near language selector.
+// ======================================================
+(function(){
+  function openSettingsSafeV64(){
+    if(typeof window.openOwnerSettings === "function"){
+      window.openOwnerSettings();
+      return;
+    }
+    const ownerBtn = Array.from(document.querySelectorAll("button"))
+      .find(b => (b.innerText || "").trim() === "Owner Settings");
+    if(ownerBtn) ownerBtn.click();
+  }
+
+  function forceOwnerSettingsButtonV64(){
+    // Remove duplicate force buttons only
+    document.querySelectorAll(".v64-force-owner-settings-btn").forEach((b, i) => {
+      if(i > 0) b.remove();
+    });
+
+    let btn = document.querySelector(".v64-force-owner-settings-btn");
+    if(!btn){
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn v64-force-owner-settings-btn";
+      btn.textContent = "Owner Settings";
+      btn.addEventListener("click", openSettingsSafeV64);
+    }
+
+    const lang = document.querySelector("#langSelect, select");
+    const accountBox = Array.from(document.querySelectorAll("div, section, header"))
+      .find(el => (el.innerText || "").includes("Client Account") && (el.innerText || "").includes("Login / Signup"));
+
+    if(lang && lang.parentElement){
+      if(btn.parentElement !== lang.parentElement){
+        lang.insertAdjacentElement("afterend", btn);
+      }
+    }else if(accountBox){
+      accountBox.insertAdjacentElement("afterbegin", btn);
+    }else{
+      document.body.prepend(btn);
+    }
+
+    btn.style.display = "inline-flex";
+    btn.style.visibility = "visible";
+    btn.style.opacity = "1";
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    forceOwnerSettingsButtonV64();
+    setTimeout(forceOwnerSettingsButtonV64, 500);
+    setTimeout(forceOwnerSettingsButtonV64, 1500);
   });
 })();

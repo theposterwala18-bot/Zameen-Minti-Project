@@ -1900,7 +1900,7 @@ main{
 
 
 /* =========================================================
-   Zameen Minti Project v63 - Version + Contact Footer
+   Zameen Minti Project v64 - Version + Contact Footer
    ========================================================= */
 .zm-version-strip {
   display:flex;
@@ -1967,7 +1967,7 @@ main{
 
 
 /* =========================================================
-   Zameen Minti Project v63 - Header/Menu Fix
+   Zameen Minti Project v64 - Header/Menu Fix
    ========================================================= */
 
 /* Remove top strip visual if any old markup remains */
@@ -2131,7 +2131,7 @@ header > div:first-child{
 
 
 /* =========================================================
-   Zameen Minti Project v63 - Multilingual Voice Assistant
+   Zameen Minti Project v64 - Multilingual Voice Assistant
    ========================================================= */
 .voice-assistant-btn{background:#eef8f1!important;color:#064d2a!important;border-color:#bde5cc!important}
 .voice-assistant-content{max-width:820px!important}
@@ -2152,7 +2152,7 @@ header > div:first-child{
 
 
 /* =========================================================
-   Zameen Minti Project v63 - Mobile first + overlap fix
+   Zameen Minti Project v64 - Mobile first + overlap fix
    ========================================================= */
 
 /* Desktop/tablet header overlap hard fix */
@@ -2385,7 +2385,7 @@ header > div:first-child{
 
 
 /* ======================================================
-   Zameen Minti Project v63 - Clean Voice Auto UI
+   Zameen Minti Project v64 - Clean Voice Auto UI
    ====================================================== */
 .voice-auto-options-v47{
   display:grid;
@@ -2484,4 +2484,24 @@ header > div:first-child{
     margin-right:0!important;
     display:block!important;
   }
+}
+
+
+/* v64 force owner settings button visible */
+.v64-force-owner-settings-btn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  visibility:visible!important;
+  opacity:1!important;
+  margin-left:10px!important;
+  padding:11px 16px!important;
+  border:1px solid #cfe3d7!important;
+  border-radius:12px!important;
+  background:#fff!important;
+  color:#0b1728!important;
+  font-weight:700!important;
+  cursor:pointer!important;
+  min-height:42px!important;
+  z-index:50!important;
 }
