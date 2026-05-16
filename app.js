@@ -2534,7 +2534,7 @@ document.addEventListener("click", function(e){
 
 
 // =========================================================
-// Zameen Minti Project v64 - Multilingual Voice Assistant
+// Zameen Minti Project v65 - Multilingual Voice Assistant
 // =========================================================
 let zmVoiceRecognition = null;
 let zmVoiceListening = false;
@@ -2666,7 +2666,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Clean Voice Auto Detect
+// Zameen Minti Project v65 - Clean Voice Auto Detect
 // Based on v39 stable buttons. No Chat/Admin binding changes.
 // ======================================================
 let zmVoiceAutoTimerV47 = null;
@@ -2799,7 +2799,7 @@ window.applyVoiceCommand = function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Vishwe Sq Ft Added
+// Zameen Minti Project v65 - Vishwe Sq Ft Added
 // 
 // ======================================================
 const ZM_VISHWE_SQFT_V48 = (window.ZM_VISHWE_SQFT || 453.75);
@@ -2840,7 +2840,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // =============================
-// Zameen Minti Project v64
+// Zameen Minti Project v65
 // Vishwe Support Added
 // =============================
 const VISHWE_SQFT_V49 = (window.ZM_VISHWE_SQFT || 453.75);
@@ -2903,7 +2903,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Stable Owner Vishwe Setting
+// Zameen Minti Project v65 - Stable Owner Vishwe Setting
 // No heavy observer. Owner Settings button remains visible.
 // ======================================================
 (function(){
@@ -3060,7 +3060,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Owner Settings 1 Vishwe Sq Ft Field
+// Zameen Minti Project v65 - Owner Settings 1 Vishwe Sq Ft Field
 // Reliable visible field inside Owner Settings modal.
 // ======================================================
 (function(){
@@ -3219,7 +3219,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Vishwe Owner Field Layout Fix
+// Zameen Minti Project v65 - Vishwe Owner Field Layout Fix
 // Keep field same size as other Owner Settings fields.
 // ======================================================
 (function(){
@@ -3258,7 +3258,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Actual Vishwe Field Size Fix
+// Zameen Minti Project v65 - Actual Vishwe Field Size Fix
 // Small layout-only fix: make 1 Vishwe Sq Ft same size as other fields.
 // ======================================================
 (function(){
@@ -3307,7 +3307,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 // ======================================================
-// Zameen Minti Project v64 - Force Owner Settings Button Visible
+// Zameen Minti Project v65 - Force Owner Settings Button Visible
 // GitHub Pages fix: button always appears near language selector.
 // ======================================================
 (function(){
@@ -3359,5 +3359,163 @@ document.addEventListener("DOMContentLoaded", function(){
     forceOwnerSettingsButtonV64();
     setTimeout(forceOwnerSettingsButtonV64, 500);
     setTimeout(forceOwnerSettingsButtonV64, 1500);
+  });
+})();
+
+
+// ======================================================
+// Zameen Minti Project v65 - Owner Settings Button Working Fix
+// Force-visible button opens Owner Settings modal directly if old function fails.
+// ======================================================
+(function(){
+  function getOwnerSettingsValuesV65(){
+    function lsNum(key, def){
+      try{
+        const s = JSON.parse(localStorage.getItem("zmSettings") || "{}");
+        const v = parseFloat(s[key]);
+        if(isFinite(v)) return v;
+      }catch(e){}
+      return def;
+    }
+    return {
+      marlaSqft: lsNum("marlaSqft", 272.25),
+      kanalSqft: lsNum("kanalSqft", 5445),
+      acreSqft: lsNum("acreSqft", 43560),
+      kanalMarla: lsNum("kanalMarla", 20),
+      acreKanal: lsNum("acreKanal", 8),
+      acreMarla: lsNum("acreMarla", 160),
+      acreVishwasian: lsNum("acreVishwasian", 96),
+      kanalVishwasian: lsNum("kanalVishwasian", 12),
+      bighaVishwasian: lsNum("bighaVishwasian", 20),
+      karamFeet: lsNum("karamFeet", 5.5),
+      vishweSqft: parseFloat(localStorage.getItem("zmVishweSqft") || lsNum("vishweSqft", 453.75)) || 453.75,
+      ownerWhatsapp: (JSON.parse(localStorage.getItem("zmSettings") || "{}").ownerWhatsapp || "")
+    };
+  }
+
+  function saveOwnerSettingsValuesV65(){
+    const ids = {
+      marlaSqft:"settingMarlaSqft",
+      kanalSqft:"settingKanalSqft",
+      acreSqft:"settingAcreSqft",
+      kanalMarla:"settingKanalMarla",
+      acreKanal:"settingAcreKanal",
+      acreMarla:"settingAcreMarla",
+      acreVishwasian:"settingAcreVishwasian",
+      kanalVishwasian:"settingKanalVishwasian",
+      bighaVishwasian:"settingBighaVishwasian",
+      karamFeet:"settingKaramFeet",
+      vishweSqft:"settingVishweSqft"
+    };
+    let s = {};
+    try{s = JSON.parse(localStorage.getItem("zmSettings") || "{}");}catch(e){s={};}
+    Object.keys(ids).forEach(key => {
+      const el = document.getElementById(ids[key]);
+      if(el){
+        const v = parseFloat(el.value);
+        if(isFinite(v) && v > 0) s[key] = v;
+      }
+    });
+    const wa = document.getElementById("settingOwnerWhatsapp");
+    if(wa) s.ownerWhatsapp = wa.value || "";
+    localStorage.setItem("zmSettings", JSON.stringify(s));
+    if(s.vishweSqft) {
+      localStorage.setItem("zmVishweSqft", String(s.vishweSqft));
+      window.ZM_VISHWE_SQFT = s.vishweSqft;
+    }
+    if(typeof renderReference === "function") renderReference();
+    closeOwnerSettingsV65();
+  }
+
+  function resetOwnerSettingsValuesV65(){
+    localStorage.removeItem("zmSettings");
+    localStorage.removeItem("zmVishweSqft");
+    window.ZM_VISHWE_SQFT = 453.75;
+    closeOwnerSettingsV65();
+    setTimeout(openOwnerSettingsV65, 100);
+    if(typeof renderReference === "function") setTimeout(renderReference, 150);
+  }
+
+  function closeOwnerSettingsV65(){
+    document.querySelectorAll(".v65-owner-modal-backdrop").forEach(x => x.remove());
+  }
+
+  function openOwnerSettingsV65(){
+    closeOwnerSettingsV65();
+    const s = getOwnerSettingsValuesV65();
+
+    const wrap = document.createElement("div");
+    wrap.className = "v65-owner-modal-backdrop";
+    wrap.innerHTML = `
+      <div class="v65-owner-modal">
+        <button class="v65-close" type="button" aria-label="Close">×</button>
+        <h2>Owner Settings</h2>
+        <div class="v65-settings-grid">
+          <label><span>1 Marla Sq Ft</span><input id="settingMarlaSqft" type="number" step="0.01" value="${s.marlaSqft}"></label>
+          <label><span>1 Kanal Sq Ft</span><input id="settingKanalSqft" type="number" step="0.01" value="${s.kanalSqft}"></label>
+          <label><span>1 Acre/Killa Sq Ft</span><input id="settingAcreSqft" type="number" step="0.01" value="${s.acreSqft}"></label>
+          <label><span>1 Kanal Marle</span><input id="settingKanalMarla" type="number" step="0.01" value="${s.kanalMarla}"></label>
+          <label><span>1 Acre Kanal</span><input id="settingAcreKanal" type="number" step="0.01" value="${s.acreKanal}"></label>
+          <label><span>1 Acre Marle</span><input id="settingAcreMarla" type="number" step="0.01" value="${s.acreMarla}"></label>
+          <label><span>1 Acre Vishwasian</span><input id="settingAcreVishwasian" type="number" step="0.01" value="${s.acreVishwasian}"></label>
+          <label><span>1 Kanal Vishwasian</span><input id="settingKanalVishwasian" type="number" step="0.01" value="${s.kanalVishwasian}"></label>
+          <label><span>1 Bigha Vishwasian</span><input id="settingBighaVishwasian" type="number" step="0.01" value="${s.bighaVishwasian}"></label>
+          <label><span>1 Karam Feet</span><input id="settingKaramFeet" type="number" step="0.01" value="${s.karamFeet}"></label>
+          <label><span>1 Vishwe Sq Ft</span><input id="settingVishweSqft" type="number" step="0.01" value="${s.vishweSqft}"></label>
+          <label><span>Owner WhatsApp Number</span><input id="settingOwnerWhatsapp" type="text" placeholder="9198xxxxxxxx" value="${s.ownerWhatsapp || ""}"></label>
+        </div>
+        <div class="v65-actions">
+          <button class="btn v65-save" type="button">Save Settings</button>
+          <button class="btn v65-reset" type="button">Reset Default</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(wrap);
+    wrap.querySelector(".v65-close").addEventListener("click", closeOwnerSettingsV65);
+    wrap.querySelector(".v65-save").addEventListener("click", saveOwnerSettingsValuesV65);
+    wrap.querySelector(".v65-reset").addEventListener("click", resetOwnerSettingsValuesV65);
+  }
+
+  window.openOwnerSettingsV65 = openOwnerSettingsV65;
+  window.closeOwnerSettingsV65 = closeOwnerSettingsV65;
+
+  function forceButtonV65(){
+    let btn = document.querySelector(".v65-owner-settings-btn");
+    if(!btn){
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn v65-owner-settings-btn";
+      btn.textContent = "Owner Settings";
+      btn.addEventListener("click", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        openOwnerSettingsV65();
+      });
+    }
+
+    const lang = document.querySelector("#langSelect, select");
+    if(lang && lang.parentElement && btn.parentElement !== lang.parentElement){
+      lang.insertAdjacentElement("afterend", btn);
+    }else if(!lang && !btn.parentElement){
+      document.body.prepend(btn);
+    }
+
+    // also make any existing Owner Settings button open the working modal
+    Array.from(document.querySelectorAll("button")).forEach(b => {
+      if((b.innerText || "").trim() === "Owner Settings" && !b.dataset.v65Hooked){
+        b.dataset.v65Hooked = "1";
+        b.addEventListener("click", function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          openOwnerSettingsV65();
+        }, true);
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    forceButtonV65();
+    setTimeout(forceButtonV65, 500);
+    setTimeout(forceButtonV65, 1500);
   });
 })();

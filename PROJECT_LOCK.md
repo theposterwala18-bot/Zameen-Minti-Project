@@ -122,7 +122,7 @@ Added map layer modes: Street, Satellite, Hybrid, and Topo. Satellite uses free 
 Added Supabase config, integration layer, SQL schema, profiles/messages/reports/land_records/visits tables, RLS policies, realtime message subscription, and cloud-ready auth/chat/report overrides. User must create Supabase project and paste URL/anon key.
 
 
-## Zameen Minti Project v64
+## Zameen Minti Project v65
 - Visible version strip added to site UI.
 - Footer contact added.
 - Contact Email: dhaliwalballi18@gmail.com
@@ -176,3 +176,7 @@ Small layout-only fix. Forced 1 Vishwe Sq Ft field to half-width like the other 
 
 ## v64 Force Owner Settings Button Visible
 GitHub Pages fix: Owner Settings button is dynamically inserted near language selector and forced visible. No module/calculation logic changed.
+
+
+## v65 Owner Settings Button Working Fix
+Added direct working Owner Settings modal and hooked all Owner Settings buttons to it. This fixes button visible but not opening on Netlify/GitHub.

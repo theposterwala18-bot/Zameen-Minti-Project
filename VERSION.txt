@@ -1,5 +1,5 @@
-Zameen Minti Project v64
+Zameen Minti Project v65
 Contact: dhaliwalballi18@gmail.com
 Feedback / Suggestion 2026-27
 
-Fix: Owner Settings button force-visible for GitHub Pages. No module logic changed.
+Fix: Owner Settings button now opens a working modal directly on Netlify/GitHub. Includes 1 Vishwe Sq Ft field.
