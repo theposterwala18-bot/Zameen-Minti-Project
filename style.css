@@ -1157,3 +1157,1228 @@ main{
 }
 .admin-note{margin-top:14px}
 @media(max-width:900px){.admin-inbox-layout{grid-template-columns:1fr}}
+
+
+/* v19 Admin Login */
+.admin-login-box{
+  background:#eef8f1;
+  border:1px solid #bde5cc;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:18px;
+}
+.admin-login-box h3{
+  margin-top:0;
+  color:#064d2a;
+}
+.admin-login-box .hint{
+  color:#637083;
+  margin-bottom:0;
+}
+#adminInboxBox.hidden{
+  display:none!important;
+}
+
+
+/* v24 security panel added on stable v19 */
+.admin-security-panel{
+  background:#fff8e8;
+  border:1px solid #f0d28a;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.admin-security-panel h3{
+  margin-top:0;
+  color:#6f4b00;
+}
+.security-btn{
+  margin-left:12px!important;
+  background:#eef8f1!important;
+  color:#064d2a!important;
+}
+.backend-security-card{
+  background:white;
+  border:1px solid #e4eee8;
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 10px 30px rgba(15,107,58,.08);
+  grid-column:1/2;
+}
+.backend-security-card h2{color:#064d2a}
+.security-roadmap{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+.security-roadmap div{
+  background:#fbfffd;
+  border:1px solid #d7eadb;
+  border-radius:16px;
+  padding:16px;
+}
+.security-roadmap h3{
+  color:#0f6b3a;
+  margin-top:0;
+}
+@media(max-width:900px){
+  .security-roadmap{grid-template-columns:1fr}
+  .backend-security-card{grid-column:auto}
+}
+
+
+/* =========================================================
+   v25 MOBILE APP VIEW
+   Mobile-first app-like layout while keeping desktop view.
+   ========================================================= */
+
+.mobile-bottom-nav,
+.mobile-ref-toggle{display:none;}
+
+@media (max-width: 900px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important;background:#f7faf8!important;}
+  .app{width:100%!important;max-width:100%!important;padding:10px!important;padding-bottom:95px!important;margin:0!important;}
+
+  header,.top-header{
+    width:100%!important;display:block!important;padding:14px!important;margin:0 0 10px 0!important;
+    border-radius:18px!important;background:#fff!important;box-shadow:0 8px 22px rgba(15,107,58,.08)!important;
+    border:1px solid #e4eee8!important;color:#102033!important;
+  }
+  header:before{display:none!important;content:none!important;}
+  header h1,.brand h1{font-size:22px!important;line-height:1.15!important;margin:0!important;color:#102033!important;}
+  header p,.brand p{font-size:12px!important;margin:4px 0 0!important;color:#475569!important;font-weight:700!important;}
+
+  .member-topbar,.account-bar{
+    position:static!important;width:100%!important;min-width:0!important;text-align:left!important;margin-top:10px!important;
+    padding:10px!important;border:1px solid #d7eadb!important;border-radius:14px!important;background:#eef8f1!important;box-shadow:none!important;
+  }
+  .member-topbar b,.account-bar b{font-size:14px!important;color:#064d2a!important;}
+  .member-topbar span,.account-bar span{font-size:12px!important;color:#0f6b3a!important;font-weight:700!important;}
+
+  .top-actions,.account-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important;margin-top:10px!important;}
+  .top-actions select,.top-actions button,.account-actions button{
+    width:auto!important;min-height:42px!important;font-size:14px!important;padding:9px 12px!important;border-radius:12px!important;
+  }
+
+  .app-nav{
+    position:sticky!important;top:0!important;z-index:50!important;overflow-x:auto!important;flex-wrap:nowrap!important;
+    gap:8px!important;padding:8px 0 12px!important;margin:0 0 14px!important;background:#f7faf8!important;
+    border-bottom:1px solid #e4eee8!important;scrollbar-width:none!important;
+  }
+  .app-nav::-webkit-scrollbar{display:none!important;}
+  .nav-pill{
+    min-width:max-content!important;height:44px!important;padding:8px 14px!important;border-radius:14px!important;
+    font-size:14px!important;white-space:nowrap!important;box-shadow:0 4px 14px rgba(0,0,0,.04)!important;
+  }
+
+  main{display:block!important;width:100%!important;}
+
+  .dashboard-module,.calculator-card,.theka-card,.sale-card,.registry-card,.reports-card,.admin-card,.gps-card,.backend-security-card,.member-chat-card{
+    width:100%!important;max-width:100%!important;grid-column:auto!important;margin:0 0 14px 0!important;
+    padding:16px!important;border-radius:20px!important;box-shadow:0 8px 22px rgba(15,107,58,.08)!important;
+  }
+
+  .dashboard-module h2,.calculator-card h2,.theka-card h2,.sale-card h2,.gps-card h2{font-size:25px!important;line-height:1.2!important;}
+  .dash-intro,.help-box,.suggestion-box{font-size:14px!important;line-height:1.55!important;padding:12px!important;border-radius:14px!important;}
+
+  .module-grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
+  .module-card{width:100%!important;min-height:110px!important;padding:16px!important;border-radius:18px!important;}
+  .module-card b{font-size:20px!important;}
+  .module-card small{font-size:13px!important;}
+  .module-icon{font-size:28px!important;}
+
+  .grid-2{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
+  label{font-size:14px!important;}
+  input,textarea,select,button{font-size:16px!important;border-radius:13px!important;}
+  input,textarea,select{width:100%!important;min-height:44px!important;}
+  button.primary,.primary{width:auto!important;min-width:130px!important;}
+  .back-btn{width:auto!important;display:inline-flex!important;align-items:center!important;margin-bottom:12px!important;}
+
+  .shape-tabs{display:flex!important;overflow-x:auto!important;gap:8px!important;flex-wrap:nowrap!important;}
+  .shape-tabs .tab{width:auto!important;min-width:max-content!important;}
+  .diagram{min-height:130px!important;border-radius:16px!important;}
+  .shape-box{width:160px!important;height:95px!important;}
+
+  .result{padding:14px!important;border-radius:18px!important;overflow:hidden!important;}
+  .result-grid,.rate-row,.theka-detail-grid,.payment-grid,.gps-stat-grid,.mini-dashboard{
+    display:grid!important;grid-template-columns:1fr!important;gap:12px!important;
+  }
+  .result-item,.rate-card,.partition-card,.main-total-card,.payments-card,.gps-stat,.mini-result{
+    width:100%!important;min-width:0!important;padding:16px!important;border-radius:16px!important;transform:none!important;
+  }
+  .rate-card{
+    display:grid!important;grid-template-columns:48px 1fr!important;grid-template-areas:"icon label" "icon value"!important;min-height:105px!important;
+  }
+  .rate-card b{font-size:28px!important;}
+  .total-inner b{font-size:34px!important;word-break:break-word!important;}
+  .theka-result-head{display:block!important;}
+  .result-actions{display:flex!important;gap:8px!important;margin-top:10px!important;}
+  .result-actions button{width:50%!important;min-width:0!important;padding:10px!important;}
+
+  .mobile-ref-toggle{
+    display:block!important;width:100%!important;margin:0 0 12px!important;background:#0f6b3a!important;
+    color:white!important;border:none!important;font-weight:800!important;
+  }
+  .reference-card{
+    display:none!important;position:static!important;width:100%!important;max-height:none!important;overflow:visible!important;
+    grid-column:auto!important;grid-row:auto!important;margin:0 0 14px!important;padding:16px!important;border-radius:20px!important;
+  }
+  .reference-card.mobile-open{display:block!important;}
+  .reference-card h3{font-size:22px!important;}
+  .ref-section{padding:12px!important;margin-bottom:10px!important;border-radius:14px!important;}
+  .ref-section li{font-size:14px!important;}
+
+  .contact-card input,.contact-card textarea,.contact-card button{width:100%!important;}
+
+  .fake-map-box{height:340px!important;border-radius:18px!important;}
+  .map-point{width:44px!important;height:44px!important;font-size:17px!important;}
+  .map-center-label{font-size:16px!important;padding:10px 14px!important;text-align:center!important;}
+
+  .modal{padding:0!important;align-items:flex-end!important;}
+  .modal-content{
+    width:100%!important;max-width:100%!important;max-height:88vh!important;border-radius:22px 22px 0 0!important;
+    padding:18px!important;overflow:auto!important;
+  }
+  .admin-inbox-layout{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
+  .chat-window,.private-chat-window,.admin-chat-window{height:330px!important;}
+
+  .mobile-bottom-nav{
+    display:grid!important;grid-template-columns:repeat(5,1fr)!important;position:fixed!important;left:10px!important;right:10px!important;
+    bottom:10px!important;z-index:999!important;background:#fff!important;border:1px solid #d7eadb!important;border-radius:22px!important;
+    box-shadow:0 12px 35px rgba(0,0,0,.16)!important;padding:8px!important;gap:4px!important;
+  }
+  .mobile-bottom-nav button{
+    width:100%!important;min-width:0!important;min-height:52px!important;display:flex!important;flex-direction:column!important;
+    align-items:center!important;justify-content:center!important;gap:2px!important;border:none!important;background:transparent!important;
+    color:#0f5132!important;font-size:18px!important;font-weight:800!important;padding:4px!important;
+  }
+  .mobile-bottom-nav span{font-size:11px!important;font-weight:700!important;}
+}
+
+@media (max-width: 420px){
+  .app{padding:8px!important;padding-bottom:88px!important;}
+  header h1,.brand h1{font-size:20px!important;}
+  .nav-pill{font-size:13px!important;padding:8px 12px!important;}
+  .dashboard-module h2,.calculator-card h2,.theka-card h2{font-size:23px!important;}
+  .rate-card b,.result-item b{font-size:24px!important;}
+  .total-inner b{font-size:30px!important;}
+}
+
+
+/* =========================================================
+   v26 Owner/Client UI + desktop nav/account polish
+   ========================================================= */
+.owner-only.hidden,.owner-module.hidden{display:none!important}
+.owner-mode-btn{border-color:#bde5cc!important;background:#eef8f1!important;color:#064d2a!important}
+.owner-mode-btn.active-owner{background:#064d2a!important;color:#fff!important}
+
+@media (min-width: 901px){
+  header,.top-header{
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    align-items:center!important;
+    gap:24px!important;
+    padding-right:18px!important;
+  }
+  .member-topbar,.account-bar{
+    position:static!important;
+    width:auto!important;
+    min-width:330px!important;
+    max-width:460px!important;
+    text-align:right!important;
+    justify-self:end!important;
+    background:#fff!important;
+    border:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+  }
+  .member-topbar span,.account-bar span{
+    display:block!important;
+    white-space:normal!important;
+    line-height:1.35!important;
+    margin-bottom:6px!important;
+  }
+  .member-actions,.account-actions,.top-actions{
+    display:flex!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:10px!important;
+    flex-wrap:wrap!important;
+  }
+  .member-actions button,.account-actions button,.top-actions button,.top-actions select{
+    width:auto!important;
+    min-width:auto!important;
+    white-space:nowrap!important;
+  }
+  .app-nav{
+    display:grid!important;
+    grid-template-columns:repeat(auto-fit,minmax(135px,1fr))!important;
+    gap:12px!important;
+    align-items:stretch!important;
+  }
+  .nav-pill{
+    min-width:0!important;
+    width:100%!important;
+    height:58px!important;
+    padding:10px 14px!important;
+    border-radius:13px!important;
+    font-size:15px!important;
+    line-height:1.15!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    gap:8px!important;
+    white-space:normal!important;
+  }
+  .nav-pill.small-nav{min-width:0!important}
+  .nav-spacer{display:none!important}
+}
+.module-card.owner-only.hidden{display:none!important}
+@media (max-width:900px){
+  .owner-only.hidden{display:none!important}
+  .owner-mode-btn{min-width:max-content!important}
+  .member-topbar span,.account-bar span{
+    display:block!important;
+    line-height:1.4!important;
+    margin-bottom:6px!important;
+  }
+}
+
+
+/* =========================================================
+   v27 Client Account overlap fix
+   ========================================================= */
+
+@media (min-width: 901px){
+  .member-topbar,
+  .account-bar{
+    min-width:520px!important;
+    max-width:620px!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    align-items:center!important;
+    column-gap:18px!important;
+    row-gap:6px!important;
+    text-align:left!important;
+  }
+
+  .member-topbar > div:first-child,
+  .account-bar > div:first-child{
+    min-width:0!important;
+  }
+
+  .member-topbar b,
+  .account-bar b{
+    display:block!important;
+    text-align:right!important;
+    white-space:nowrap!important;
+  }
+
+  .member-topbar span,
+  .account-bar span,
+  #topMemberStatus,
+  #accountStatus{
+    display:block!important;
+    text-align:right!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    max-width:360px!important;
+    padding-right:4px!important;
+    margin:0!important;
+    line-height:1.45!important;
+  }
+
+  .member-actions,
+  .account-actions{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+    flex-wrap:nowrap!important;
+  }
+
+  .member-actions button,
+  .account-actions button{
+    flex:0 0 auto!important;
+    margin:0!important;
+  }
+}
+
+/* If header is narrow, stack account cleanly instead of touching button */
+@media (min-width:901px) and (max-width:1250px){
+  .member-topbar,
+  .account-bar{
+    min-width:360px!important;
+    grid-template-columns:1fr!important;
+    text-align:right!important;
+  }
+
+  .member-topbar span,
+  .account-bar span,
+  #topMemberStatus,
+  #accountStatus{
+    max-width:100%!important;
+  }
+
+  .member-actions,
+  .account-actions{
+    justify-content:flex-end!important;
+    flex-wrap:wrap!important;
+  }
+}
+
+
+/* v28 Real Map Polygon Measurement */
+.map-tools{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin:16px 0;
+}
+.map-tools button{
+  width:auto;
+}
+.real-map-box{
+  width:100%;
+  height:560px;
+  border:2px solid #bde5cc;
+  border-radius:22px;
+  overflow:hidden;
+  background:#eef8f1;
+  position:relative;
+  box-shadow:0 10px 28px rgba(15,107,58,.08);
+}
+.map-loading-note{
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#064d2a;
+  font-weight:800;
+  padding:20px;
+}
+.map-instructions{
+  background:#fff8e8;
+  border:1px solid #f0d28a;
+  border-radius:14px;
+  padding:14px;
+  margin:14px 0;
+}
+.map-instructions ol{
+  margin:8px 0 0 20px;
+}
+.leaflet-container{
+  font-family:Arial, sans-serif;
+}
+@media(max-width:900px){
+  .real-map-box{
+    height:420px;
+    border-radius:18px;
+  }
+  .map-tools{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .map-tools button{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
+
+
+/* v29 Map Search + Distance */
+.map-search-box{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  margin:16px 0 10px;
+}
+.map-search-box input{
+  min-height:46px;
+}
+.map-mode-switch{
+  display:flex;
+  gap:10px;
+  margin:10px 0;
+  flex-wrap:wrap;
+}
+.map-search-results{
+  background:#fff;
+  border:1px solid #d7eadb;
+  border-radius:16px;
+  padding:10px;
+  margin:12px 0;
+  box-shadow:0 6px 18px rgba(0,0,0,.05);
+}
+.map-search-result{
+  width:100%;
+  display:block;
+  text-align:left;
+  background:#fbfffd!important;
+  border:1px solid #e4eee8!important;
+  border-radius:12px!important;
+  padding:12px!important;
+  margin-bottom:8px;
+}
+.map-search-result b{
+  display:block;
+  color:#064d2a;
+  margin-bottom:4px;
+}
+.map-search-result span{
+  display:block;
+  color:#64748b;
+  font-size:13px;
+  line-height:1.35;
+}
+.map-result-loading{
+  padding:12px;
+  color:#064d2a;
+  font-weight:800;
+}
+@media(max-width:900px){
+  .map-search-box{
+    grid-template-columns:1fr;
+  }
+  .map-mode-switch{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .map-mode-switch button{
+    width:100%!important;
+  }
+}
+
+
+/* v30 Google-Maps-style live suggestions */
+.live-search-wrap{
+  position:relative;
+}
+.map-search-input-wrap{
+  position:relative;
+  min-width:0;
+}
+.live-map-suggestions{
+  position:absolute;
+  left:0;
+  right:0;
+  top:calc(100% + 6px);
+  z-index:2000;
+  background:#fff;
+  border:1px solid #d7eadb;
+  border-radius:16px;
+  box-shadow:0 18px 40px rgba(0,0,0,.16);
+  padding:8px;
+  max-height:420px;
+  overflow:auto;
+}
+.suggestion-title{
+  padding:8px 10px;
+  font-size:13px;
+  color:#64748b;
+  font-weight:800;
+}
+.live-suggestion-item{
+  width:100%;
+  display:grid;
+  grid-template-columns:36px 1fr;
+  gap:10px;
+  align-items:flex-start;
+  text-align:left;
+  background:#fff!important;
+  border:0!important;
+  border-bottom:1px solid #edf2ef!important;
+  border-radius:10px!important;
+  padding:10px!important;
+}
+.live-suggestion-item:hover,
+.live-suggestion-item.active{
+  background:#eef8f1!important;
+}
+.suggestion-icon{
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eaf8f0;
+  border-radius:999px;
+}
+.live-suggestion-item b{
+  display:block;
+  color:#102033;
+  font-size:15px;
+  margin-bottom:3px;
+}
+.live-suggestion-item small{
+  display:block;
+  color:#64748b;
+  font-size:12px;
+  line-height:1.35;
+}
+.live-suggestion-item em{
+  display:inline-block;
+  margin-top:5px;
+  background:#f1f5f9;
+  color:#475569;
+  font-size:11px;
+  font-style:normal;
+  padding:2px 7px;
+  border-radius:999px;
+}
+.suggestion-loading,
+.suggestion-empty{
+  padding:14px;
+  color:#064d2a;
+  font-weight:700;
+  line-height:1.5;
+}
+.selected-place-card{
+  background:#eef8f1;
+  border:1px solid #bde5cc;
+  border-radius:14px;
+  padding:12px;
+}
+.selected-place-card b,
+.selected-place-card span,
+.selected-place-card small{
+  display:block;
+}
+.selected-place-card b{
+  color:#064d2a;
+  margin-bottom:4px;
+}
+.selected-place-card span{
+  color:#102033;
+  margin-bottom:4px;
+}
+.selected-place-card small{
+  color:#64748b;
+}
+@media(max-width:900px){
+  .live-map-suggestions{
+    position:fixed;
+    left:10px;
+    right:10px;
+    top:145px;
+    max-height:55vh;
+  }
+}
+
+
+/* v31 selected place top + bottom */
+.selected-place-top{
+  margin:12px 0;
+}
+.selected-place-highlight{
+  display:grid!important;
+  grid-template-columns:1fr auto;
+  gap:12px;
+  align-items:center;
+  background:#eef8f1!important;
+  border:1.5px solid #0f6b3a!important;
+  border-radius:16px!important;
+  padding:12px 14px!important;
+  box-shadow:0 6px 18px rgba(15,107,58,.08);
+}
+.selected-place-highlight b{
+  display:block;
+  color:#064d2a;
+  font-size:16px;
+  margin-bottom:4px;
+}
+.selected-place-highlight span{
+  display:block;
+  color:#102033;
+  font-weight:600;
+  line-height:1.35;
+}
+.selected-place-highlight small{
+  display:block;
+  color:#64748b;
+  margin-top:4px;
+}
+.selected-place-highlight button{
+  width:auto!important;
+  min-width:150px!important;
+  background:#0f6b3a!important;
+  color:white!important;
+  border:none!important;
+}
+@media(max-width:900px){
+  .selected-place-highlight{
+    grid-template-columns:1fr;
+  }
+  .selected-place-highlight button{
+    width:100%!important;
+  }
+}
+
+
+/* v32 owner password modal + eye */
+.owner-login-content{
+  max-width:460px!important;
+}
+.password-eye-wrap{
+  display:grid;
+  grid-template-columns:1fr 50px;
+  gap:8px;
+  align-items:center;
+  width:100%;
+}
+.password-eye-wrap input{
+  width:100%!important;
+}
+.password-eye-wrap button{
+  width:50px!important;
+  min-width:50px!important;
+  padding:0!important;
+  font-size:18px!important;
+  background:#eef8f1!important;
+  color:#064d2a!important;
+}
+@media(max-width:900px){
+  .password-eye-wrap{
+    grid-template-columns:1fr 48px;
+  }
+}
+
+
+/* v33 map layer switch */
+.map-layer-switch{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:10px 0 14px;
+  background:#f8fbf9;
+  border:1px solid #d7eadb;
+  border-radius:14px;
+  padding:10px;
+}
+.map-layer-switch button{
+  width:auto;
+  min-width:110px;
+}
+.leaflet-control-scale-line{
+  background:rgba(255,255,255,.9)!important;
+  border-color:#102033!important;
+  color:#102033!important;
+  font-weight:700;
+}
+@media(max-width:900px){
+  .map-layer-switch{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+  .map-layer-switch button{
+    width:100%!important;
+    min-width:0!important;
+  }
+}
+
+
+/* v34 Supabase status */
+.supabase-status-card{
+  background:#eef8f1;
+  border:1px solid #bde5cc;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:16px;
+}
+.supabase-status-card h3{
+  margin-top:0;
+  color:#064d2a;
+}
+.supabase-status-card.cloud-ok{
+  background:#ecfdf5;
+  border-color:#10b981;
+}
+
+
+/* =========================================================
+   Zameen Minti Project v36 - Version + Contact Footer
+   ========================================================= */
+.zm-version-strip {
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  background:#eef8f1;
+  border:1px solid #bde5cc;
+  color:#064d2a;
+  padding:10px 14px;
+  border-radius:14px;
+  margin:10px 0 18px;
+  font-weight:800;
+  font-size:14px;
+}
+.zm-version-strip a {
+  color:#064d2a;
+  text-decoration:none;
+}
+.zm-footer-contact {
+  margin:28px auto 16px;
+  padding:18px;
+  max-width:1320px;
+  border-radius:18px;
+  background:#f8fbf9;
+  border:1px solid #d7eadb;
+  color:#102033;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  flex-wrap:wrap;
+}
+.zm-footer-contact b {
+  color:#064d2a;
+  font-size:18px;
+}
+.zm-footer-contact p {
+  margin:5px 0;
+}
+.zm-footer-contact a {
+  color:#0f6b3a;
+  font-weight:800;
+  text-decoration:none;
+}
+.zm-footer-note {
+  color:#64748b;
+  max-width:520px;
+}
+@media(max-width:900px){
+  .zm-version-strip {
+    align-items:flex-start;
+    justify-content:flex-start;
+    font-size:12px;
+    padding:9px 10px;
+  }
+  .zm-footer-contact {
+    margin-bottom:95px;
+    padding:14px;
+    display:block;
+  }
+}
+
+
+/* =========================================================
+   Zameen Minti Project v37 - Header/Menu Fix
+   ========================================================= */
+
+/* Remove top strip visual if any old markup remains */
+.zm-version-strip{display:none!important;}
+
+/* Top-left hamburger/menu button */
+.module-menu-btn{
+  position:fixed;
+  top:105px;
+  left:12px;
+  z-index:1200;
+  width:46px!important;
+  height:46px!important;
+  min-width:46px!important;
+  border-radius:14px!important;
+  background:#0f6b3a!important;
+  color:#fff!important;
+  border:none!important;
+  font-size:24px!important;
+  font-weight:900!important;
+  box-shadow:0 8px 24px rgba(15,107,58,.22)!important;
+}
+.module-drawer{
+  position:fixed;
+  top:158px;
+  left:12px;
+  z-index:1201;
+  width:285px;
+  background:#ffffff;
+  border:1px solid #d7eadb;
+  border-radius:18px;
+  box-shadow:0 18px 50px rgba(0,0,0,.18);
+  padding:12px;
+}
+.drawer-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 8px 12px;
+  color:#064d2a;
+}
+.drawer-head button{
+  width:36px!important;
+  min-width:36px!important;
+  height:36px!important;
+  padding:0!important;
+}
+.module-drawer > button:not(.drawer-head button){
+  width:100%!important;
+  margin:6px 0!important;
+  text-align:left!important;
+  justify-content:flex-start!important;
+  background:#fbfffd!important;
+  color:#102033!important;
+  border:1px solid #d7eadb!important;
+}
+.module-drawer > button:hover{
+  background:#eef8f1!important;
+  color:#064d2a!important;
+}
+
+/* Center title block */
+header h1,
+.top-header h1,
+.brand h1{
+  text-align:center!important;
+}
+header p,
+.top-header p,
+.brand p{
+  text-align:center!important;
+}
+.brand,
+header > div:first-child{
+  justify-content:center!important;
+  text-align:center!important;
+}
+
+/* Top-right language + owner settings area */
+@media (min-width:901px){
+  header,.top-header{
+    position:relative!important;
+    min-height:230px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .brand,
+  header > div:first-child{
+    position:absolute!important;
+    left:50%!important;
+    top:64px!important;
+    transform:translateX(-50%)!important;
+    width:max-content!important;
+    max-width:70%!important;
+  }
+
+  .top-actions,
+  .account-actions{
+    position:absolute!important;
+    right:18px!important;
+    top:118px!important;
+    display:flex!important;
+    gap:10px!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+  }
+
+  .member-topbar,.account-bar{
+    position:absolute!important;
+    right:18px!important;
+    top:176px!important;
+    min-width:360px!important;
+    max-width:520px!important;
+  }
+
+  .lang-select,
+  .owner-settings-btn{
+    height:46px!important;
+    width:auto!important;
+    min-width:120px!important;
+  }
+}
+
+/* Dashboard badge v37 wrapping clean */
+.project-lock-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  flex-wrap:wrap!important;
+}
+
+/* footer has final version/contact only */
+.zm-footer-contact{
+  margin-top:28px!important;
+}
+
+@media(max-width:900px){
+  .module-menu-btn{
+    top:12px;
+    left:12px;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+  }
+  .module-drawer{
+    top:62px;
+    left:10px;
+    right:10px;
+    width:auto;
+  }
+  header,.top-header{
+    padding-top:62px!important;
+  }
+  .brand, header > div:first-child{
+    justify-content:center!important;
+    width:100%!important;
+  }
+}
+
+
+/* =========================================================
+   Zameen Minti Project v39 - Multilingual Voice Assistant
+   ========================================================= */
+.voice-assistant-btn{background:#eef8f1!important;color:#064d2a!important;border-color:#bde5cc!important}
+.voice-assistant-content{max-width:820px!important}
+.voice-help-box{background:#eef8f1;border:1px solid #bde5cc;border-radius:16px;padding:14px;margin-bottom:16px;color:#102033}
+.voice-help-box b{color:#064d2a}
+.voice-actions{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.voice-actions button{width:auto!important}
+.voice-preview{margin-top:14px;background:#fbfffd;border:1px solid #d7eadb;border-radius:18px;padding:16px}
+.voice-preview h3{margin-top:0;color:#064d2a}
+.voice-preview-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.voice-preview-grid div{background:#fff;border:1px solid #e4eee8;border-radius:14px;padding:12px}
+.voice-preview-grid span{display:block;color:#64748b;font-size:13px}
+.voice-preview-grid b{display:block;color:#0f6b3a;font-size:22px}
+.voice-note{margin-bottom:0;color:#64748b}
+.voice-examples{margin-top:16px;background:#fff8e8;border:1px solid #f0d28a;border-radius:16px;padding:14px}
+.voice-examples h3{margin-top:0;color:#6f4b00}
+@media(max-width:900px){.voice-actions{display:grid;grid-template-columns:1fr 1fr}.voice-actions button{width:100%!important;min-width:0!important}}
+
+
+/* =========================================================
+   Zameen Minti Project v39 - Mobile first + overlap fix
+   ========================================================= */
+
+/* Desktop/tablet header overlap hard fix */
+@media (min-width:901px){
+  header,.top-header{
+    min-height:260px!important;
+    display:grid!important;
+    grid-template-columns:120px 1fr 390px!important;
+    grid-template-rows:auto auto!important;
+    align-items:center!important;
+    column-gap:18px!important;
+    padding:28px 22px 34px!important;
+  }
+
+  .brand, header > div:first-child{
+    position:static!important;
+    transform:none!important;
+    grid-column:2!important;
+    grid-row:1 / span 2!important;
+    justify-self:center!important;
+    align-self:center!important;
+    width:100%!important;
+    max-width:650px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-items:center!important;
+    text-align:center!important;
+  }
+
+  .brand-icon{
+    justify-self:start!important;
+    align-self:center!important;
+  }
+
+  header h1,.top-header h1,.brand h1{
+    font-size:38px!important;
+    line-height:1.15!important;
+    margin:0!important;
+    text-align:center!important;
+  }
+
+  header p,.top-header p,.brand p{
+    font-size:17px!important;
+    text-align:center!important;
+    margin-top:10px!important;
+  }
+
+  .top-actions,.account-actions{
+    position:static!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    align-self:end!important;
+    display:flex!important;
+    gap:10px!important;
+    flex-wrap:wrap!important;
+    justify-content:flex-end!important;
+    max-width:390px!important;
+  }
+
+  .member-topbar,.account-bar{
+    position:static!important;
+    grid-column:3!important;
+    grid-row:2!important;
+    justify-self:end!important;
+    align-self:start!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:8px 14px!important;
+    min-width:390px!important;
+    max-width:390px!important;
+    padding:12px!important;
+    background:#ffffff!important;
+    border:1px solid #d7eadb!important;
+    border-radius:16px!important;
+    box-shadow:0 8px 22px rgba(15,107,58,.06)!important;
+  }
+
+  .member-topbar b,.account-bar b{
+    grid-column:1/2!important;
+    text-align:right!important;
+    white-space:nowrap!important;
+    color:#064d2a!important;
+    line-height:1.2!important;
+  }
+
+  .member-topbar span,.account-bar span,#topMemberStatus,#accountStatus{
+    grid-column:1/2!important;
+    text-align:right!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    max-width:240px!important;
+    line-height:1.35!important;
+    font-size:14px!important;
+    color:#0f6b3a!important;
+    font-weight:800!important;
+  }
+
+  .member-topbar button,.account-bar button,
+  .member-actions button,.account-actions button{
+    grid-column:2/3!important;
+    grid-row:1 / span 2!important;
+    align-self:center!important;
+    justify-self:end!important;
+    width:auto!important;
+    white-space:nowrap!important;
+    min-width:120px!important;
+    margin:0!important;
+  }
+
+  .lang-select,.owner-settings-btn{
+    min-width:120px!important;
+    height:44px!important;
+  }
+}
+
+/* Default app-like layout for phone and narrow screens */
+@media (max-width:900px){
+  body{
+    background:#f7faf8!important;
+  }
+
+  .app{
+    max-width:480px!important;
+    margin:0 auto!important;
+    padding:10px!important;
+    padding-bottom:96px!important;
+  }
+
+  header,.top-header{
+    min-height:auto!important;
+    padding:64px 12px 14px!important;
+    border-radius:22px!important;
+  }
+
+  .brand, header > div:first-child{
+    width:100%!important;
+    justify-content:center!important;
+    align-items:center!important;
+    text-align:center!important;
+  }
+
+  header h1,.top-header h1,.brand h1{
+    font-size:24px!important;
+    line-height:1.15!important;
+    text-align:center!important;
+  }
+
+  header p,.top-header p,.brand p{
+    font-size:13px!important;
+    text-align:center!important;
+  }
+
+  .top-actions,.account-actions{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    margin-top:12px!important;
+    position:static!important;
+  }
+
+  .top-actions select,.top-actions button,
+  .account-actions select,.account-actions button{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  .member-topbar,.account-bar{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:6px 8px!important;
+    padding:10px!important;
+    margin-top:10px!important;
+  }
+
+  .member-topbar b,.account-bar b{
+    grid-column:1/2!important;
+    text-align:left!important;
+    font-size:14px!important;
+  }
+
+  .member-topbar span,.account-bar span,#topMemberStatus,#accountStatus{
+    grid-column:1/2!important;
+    text-align:left!important;
+    font-size:12px!important;
+    line-height:1.35!important;
+    white-space:normal!important;
+  }
+
+  .member-topbar button,.account-bar button{
+    grid-column:2/3!important;
+    grid-row:1 / span 2!important;
+    width:auto!important;
+    min-width:94px!important;
+    padding:8px 10px!important;
+    font-size:13px!important;
+  }
+
+  .app-nav{
+    display:flex!important;
+    overflow-x:auto!important;
+    flex-wrap:nowrap!important;
+    gap:8px!important;
+    padding-bottom:10px!important;
+  }
+
+  .nav-pill{
+    min-width:max-content!important;
+    height:46px!important;
+    padding:8px 14px!important;
+    font-size:14px!important;
+  }
+
+  .module-menu-btn{
+    position:fixed!important;
+    top:12px!important;
+    left:calc(50% - 228px)!important;
+  }
+}
+
+@media(max-width:500px){
+  .module-menu-btn{
+    left:12px!important;
+  }
+}

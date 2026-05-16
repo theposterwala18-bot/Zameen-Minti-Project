@@ -1,24 +1,43 @@
 <!DOCTYPE html>
 <html lang="pa">
 <head>
+  <!-- ZAMEEN_MINTI_VERSION: Zameen Minti Project v39 | Contact: dhaliwalballi18@gmail.com -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zameen Minti Calculator</title>
   <link rel="stylesheet" href="style.css" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
   <div class="app">
-    <header>
+
+<button id="moduleMenuBtn" class="module-menu-btn" onclick="toggleModuleDrawer()">☰</button>
+<div id="moduleDrawer" class="module-drawer hidden">
+  <div class="drawer-head">
+    <b>Modules Menu</b>
+    <button onclick="toggleModuleDrawer()">×</button>
+  </div>
+  <button onclick="showModule('dashboard');toggleModuleDrawer()">⌂ Dashboard</button>
+  <button onclick="showModule('measurement');toggleModuleDrawer()">📐 ਜ਼ਮੀਨ ਦੀ ਮਿਣਤੀ</button>
+  <button onclick="showModule('theka');toggleModuleDrawer()">🌾 ਠੇਕਾ ਤੇ ਜ਼ਮੀਨ</button>
+  <button onclick="showModule('sale');toggleModuleDrawer()">💰 Sale</button>
+  <button onclick="showModule('reports');toggleModuleDrawer()">📄 Reports</button>
+  <button onclick="showModule('gps');toggleModuleDrawer()">🌍 GPS/Map</button>
+  <button class="owner-only hidden" onclick="openAdminInbox();toggleModuleDrawer()">📥 Admin Inbox</button>
+</div>
+
+<header>
       <div>
         <h1 id="appTitle">ਜ਼ਮੀਨ ਮਿਣਤੀ ਕੈਲਕੂਲੇਟਰ</h1>
         <p id="subtitle">Punjab Land Measurement Calculator</p>
       </div>
       <div class="top-actions">
-        <select id="languageSelect">
+        <select class="lang-select" id="languageSelect">
           <option value="pa">ਪੰਜਾਬੀ</option>
           <option value="en">English</option>
         </select>
-        <button onclick="openOwnerPanel()" id="ownerBtn">Owner Settings</button>
+        <button onclick="openOwnerPanel()" id="ownerBtn" class="owner-only hidden" class="owner-settings-btn owner-only hidden" class="owner-settings-btn">Owner Settings</button>
       </div>
     </header>
 
@@ -44,15 +63,18 @@
       <button class="nav-pill disabled-nav" type="button"><span>🧾</span> ਹੋਰ ਟੂਲਜ਼ ▾</button>
       <div class="nav-spacer"></div>
       <button class="nav-pill small-nav" onclick="openPrivateChat()">💬 ਚੈਟ</button>
-      <button class="nav-pill small-nav owner-inbox-btn" onclick="openAdminInbox()">📥 Admin Inbox <span id="adminUnreadBadge" class="unread-badge hidden">0</span></button>
+      <button class="nav-pill small-nav owner-inbox-btn owner-only hidden" onclick="openAdminInbox()">📥 Admin Inbox <span id="adminUnreadBadge" class="unread-badge hidden">0</span></button>
       <button class="nav-pill small-nav" type="button">🔔 ਨੋਟੀਫਿਕੇਸ਼ਨ</button>
+          <button id="voiceAssistantBtn" class="nav-pill voice-assistant-btn" onclick="openVoiceAssistant()">🎙️ Voice</button>
+      <button id="ownerModeBtn" class="nav-pill owner-mode-btn" onclick="ownerModeLogin()">🔐 Owner</button>
     </nav>
 
     <main>
+      <button id="mobileReferenceToggle" class="mobile-ref-toggle" onclick="document.querySelector('.reference-card').classList.toggle('mobile-open')">📚 ਮਾਪ Reference ਵੇਖੋ / Hide</button>
 
       <section id="dashboardModule" class="dashboard-module">
         <h2>ਮੁੱਖ Dashboard</h2>
-        <div class="project-lock-badge">🔒 Zameen Minti Project Locked v13 — Software/Site Update Mode</div>
+        <div class="project-lock-badge">🔒 Zameen Minti Project Locked v39 — Software/Site Update Mode</div>
         <p class="dash-intro">
           ਇਹ ਸਿਸਟਮ ਜ਼ਮੀਨ ਨਾਲ ਸੰਬੰਧਿਤ ਵੱਖ-ਵੱਖ ਕੰਮਾਂ ਲਈ ਬਣਾਇਆ ਗਿਆ ਹੈ।
           ਹੇਠਾਂ ਦਿੱਤੇ module ਵਿਚੋਂ ਆਪਣੀ ਲੋੜ ਮੁਤਾਬਕ option ਚੁਣੋ।
@@ -107,11 +129,24 @@
             <small>Future: Google Maps ਤੇ points select ਕਰਕੇ area calculate ਕਰੋ।</small>
           </button>
 
-          <button class="module-card" onclick="showModule('admin')">
+          <button class="module-card owner-only hidden" onclick="showModule('admin')">
             <span class="module-icon">👨‍💼</span>
             <b>Owner Admin</b>
             <small>Clients, reports, chats ਅਤੇ analytics ਦਾ owner dashboard।</small>
           </button>
+        
+          <button class="module-card owner-only hidden" onclick="showModuleSafeV24('backendSecurity')">
+            <span class="module-icon">🔐</span>
+            <b>Cloud Login / Security</b>
+            <small>Supabase/Firebase login, hidden credentials, secure admin roles ਅਤੇ real database plan।</small>
+          </button>
+        </div>
+
+        
+        <div id="supabaseStatusCard" class="supabase-status-card">
+          <h3>☁️ Cloud Database Status</h3>
+          <p id="supabaseStatusText">Supabase config add ਕਰੋ — ਫਿਰ real login, chat ਤੇ reports cloud ਵਿੱਚ save ਹੋਣਗੇ।</p>
+          <button class="primary" onclick="testSupabaseConnection()">Test Supabase Connection</button>
         </div>
 
         <div class="suggestion-box">
@@ -219,7 +254,7 @@
         <div id="reportsList" class="reports-list"></div>
       </section>
 
-      <section id="adminModule" class="admin-card module-page hidden">
+      <section id="adminModule" class="admin-card module-page hidden owner-module">
         <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
         <h2>Owner Admin Dashboard</h2>
         <div class="mini-dashboard">
@@ -234,57 +269,81 @@
       </section>
 
       
+      
       <section id="gpsModule" class="gps-card module-page hidden">
         <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
-        <h2>GPS / Google Maps ਮਿਣਤੀ</h2>
+        <h2>GPS / Map Polygon ਮਿਣਤੀ</h2>
 
         <div class="help-box">
-          Map ਤੇ ਆਪਣੀ ਜ਼ਮੀਨ ਦੇ corner points add ਕਰੋ। System polygon area calculate ਕਰਕੇ sq ft, ਮਰਲੇ, ਕਨਾਲ ਅਤੇ ਏਕੜ/ਕਿੱਲਾ automatic ਕੱਢੇਗਾ।
+          Map ਤੇ ਆਪਣੀ ਜ਼ਮੀਨ ਦੇ corner points click ਕਰੋ। Points ਤੋਂ polygon ਬਣੇਗਾ ਤੇ system sq ft, ਮਰਲੇ, ਕਨਾਲ, ਏਕੜ/ਕਿੱਲਾ calculate ਕਰੇਗਾ।
+          ਇਹ free OpenStreetMap/Leaflet ਨਾਲ ਚੱਲਦਾ ਹੈ। Google Maps ਲਈ future ਵਿੱਚ API key add ਹੋ ਸਕਦੀ ਹੈ।
         </div>
 
-        <div class="gps-topbar">
-          <div class="gps-chip">📍 Click map to add points</div>
-          <div class="gps-chip">📐 Polygon auto measurement</div>
-          <div class="gps-chip">🌍 Irregular shape support</div>
+        <div class="map-search-box live-search-wrap">
+          <div class="map-search-input-wrap">
+            <input id="mapSearchInput" type="text" placeholder="ਪਿੰਡ, ਸ਼ਹਿਰ, ਜਗ੍ਹਾ search ਕਰੋ... ਜਿਵੇਂ Mohar Singh Wala" autocomplete="off">
+            <div id="liveMapSuggestions" class="live-map-suggestions hidden"></div>
+          </div>
+          <button class="primary" onclick="searchMapPlace()">Search Place</button>
         </div>
 
-        <div class="fake-map-box">
-          <div class="map-grid"></div>
-
-          <button class="map-point point1" onclick="addGpsPoint('A')">A</button>
-          <button class="map-point point2" onclick="addGpsPoint('B')">B</button>
-          <button class="map-point point3" onclick="addGpsPoint('C')">C</button>
-          <button class="map-point point4" onclick="addGpsPoint('D')">D</button>
-
-          <svg class="polygon-lines" viewBox="0 0 1000 500" preserveAspectRatio="none">
-            <polygon points="180,120 760,110 860,360 260,390"
-             fill="rgba(15,107,58,.15)"
-             stroke="#0f6b3a"
-             stroke-width="4"/>
-          </svg>
-
-          <div class="map-center-label">Punjab Land GPS Area</div>
+        <div class="map-mode-switch">
+          <button id="areaModeBtn" class="primary" onclick="setMapMode('area')">📐 Area Mode</button>
+          <button id="distanceModeBtn" onclick="setMapMode('distance')">📏 Distance Mode</button>
         </div>
 
-        <div class="gps-controls">
-          <button class="primary" onclick="simulateGpsMeasurement()">Calculate GPS Area</button>
-          <button onclick="resetGpsMeasurement()">Reset Points</button>
+        <div class="map-layer-switch">
+          <button id="streetLayerBtn" class="primary" onclick="setMapLayer('street')">🗺️ Street</button>
+          <button id="satLayerBtn" onclick="setMapLayer('satellite')">🛰️ Satellite</button>
+          <button id="hybridLayerBtn" onclick="setMapLayer('hybrid')">🌍 Hybrid</button>
+          <button id="topoLayerBtn" onclick="setMapLayer('topo')">⛰️ Topo</button>
+        </div>
+
+        <div class="map-tools">
+          <button class="primary" onclick="initRealMap()">Map Start ਕਰੋ</button>
+          <button onclick="locateMeOnMap()">My Location</button>
+          <button onclick="undoMapPoint()">Undo Point</button>
+          <button onclick="clearMapPolygon()">Clear</button>
+          <button onclick="calculateMapPolygonArea()">Calculate Area</button>
+          <button onclick="calculateMapDistance()">Calculate Distance</button>
+        </div>
+
+        <div id="selectedPlaceTop" class="selected-place-top hidden"></div>
+
+        <div id="realMap" class="real-map-box">
+          <div class="map-loading-note">Map start ਕਰਨ ਲਈ “Map Start ਕਰੋ” click ਕਰੋ।</div>
+        </div>
+        <div id="mapSearchResults" class="map-search-results hidden"></div>
+
+        <div class="map-instructions">
+          <b>ਕਿਵੇਂ ਵਰਤਣਾ:</b>
+          <ol>
+            <li>Map Start ਕਰੋ।</li>
+            <li>Map ਤੇ ਜ਼ਮੀਨ ਦੇ ਹਰ corner ਤੇ click ਕਰੋ।</li>
+            <li>ਘੱਟੋ-ਘੱਟ 3 points ਤੋਂ polygon ਬਣ ਜਾਵੇਗਾ।</li>
+            <li>Calculate Area click ਕਰੋ।</li>
+          </ol>
         </div>
 
         <div id="gpsResult" class="result hidden"></div>
-
-        <div class="coming-soon-box">
-          <h3>🚀 Future Real Features</h3>
-          <ul>
-            <li>Real Google Maps integration</li>
-            <li>Live GPS walking measurement</li>
-            <li>Village-wise land save system</li>
-            <li>Client account map history</li>
-            <li>Satellite view measurement</li>
-          </ul>
-        </div>
       </section>
 
+
+
+
+      <section id="backendSecurityModule" class="backend-security-card module-page hidden owner-module">
+        <button class="back-btn" onclick="showModule('dashboard')">← Dashboard</button>
+        <h2>Cloud Login / Supabase Setup Plan</h2>
+        <div class="help-box">
+          Real secure admin/client login ਲਈ localStorage enough ਨਹੀਂ। Next real online version ਵਿੱਚ Supabase ਜਾਂ Firebase connect ਕਰਾਂਗੇ।
+        </div>
+        <div class="security-roadmap">
+          <div><h3>1. Supabase Auth</h3><p>Client signup/login, admin login, password reset, email/mobile auth.</p></div>
+          <div><h3>2. Database Tables</h3><p>users, messages, reports, visits, premium_plans, land_records.</p></div>
+          <div><h3>3. Admin Roles</h3><p>owner/admin/user roles. Owner ਹੀ formula, premium, chats control ਕਰੇਗਾ।</p></div>
+          <div><h3>4. Live Chat</h3><p>Client message instantly admin inbox ਵਿੱਚ ਆਵੇਗਾ, ਜਿਵੇਂ Facebook/Instagram.</p></div>
+        </div>
+      </section>
 
       <aside class="reference-card">
         <h3 id="referenceTitle">Land Unit Reference</h3>
@@ -339,6 +398,8 @@
     </div>
   </div>
 
+  
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="app.js"></script>
 
   <div id="authModal" class="modal hidden">
@@ -391,15 +452,38 @@
   <div id="adminInboxModal" class="modal hidden">
     <div class="modal-content admin-inbox-content">
       <div class="modal-head">
-        <h2>Owner Admin Inbox</h2>
+        <h2>Owner Admin Inbox</h2><button class="security-btn" onclick="toggleAdminSecurity()">⚙ Security</button>
         <button onclick="closeAdminInbox()">×</button>
       </div>
 
-      <div class="admin-inbox-layout">
+      
+      <div id="adminLoginBox" class="admin-login-box">
+        <h3>Admin Login</h3>
+        <div class="grid-2">
+          <label>Admin ID <input id="adminUserId" type="text" placeholder="Admin ID"></label>
+          <label>Password <div class="password-eye-wrap"><input id="adminUserPass" type="password" placeholder="Password"><button type="button" onclick="togglePasswordEye('adminUserPass', this)">👁</button></div></label>
+        </div>
+        <button class="primary" onclick="adminLogin()">Login Admin</button>
+        <p class="hint">Admin password public UI ਵਿੱਚ show ਨਹੀਂ ਕੀਤਾ ਗਿਆ।</p>
+      </div>
+
+      
+      <div id="adminSecurityPanel" class="admin-security-panel hidden">
+        <h3>Admin Security</h3>
+        <div class="grid-2">
+          <label>Current Password <input id="adminCurrentPass" type="password" placeholder="Current password"></label>
+          <label>New Password <input id="adminNewPass" type="password" placeholder="New password"></label>
+        </div>
+        <button class="primary" onclick="changeAdminPassword()">Change Password</button>
+        <button onclick="adminLogout()">Admin Logout</button>
+        <p class="hint">Password hashed form ਵਿੱਚ save ਹੁੰਦਾ ਹੈ। Real online security ਲਈ Supabase/Firebase backend ਲੋੜੀਂਦਾ ਹੈ।</p>
+      </div>
+
+      <div id="adminInboxBox" class="admin-inbox-layout hidden">
         <aside class="admin-chat-list">
           <div class="admin-list-head">
             <b>Clients / Messages</b>
-            <button onclick="loadAdminInbox()">Refresh</button>
+            <button onclick="loadAdminInbox()">Refresh</button><button onclick="syncAllChatsToAdmin()">Sync</button>
           </div>
           <div id="adminChatList"></div>
         </aside>
@@ -418,6 +502,113 @@
 
       <div class="note-card admin-note">
         ਨੋਟ: ਇਹ current version browser/localStorage demo ਹੈ। Real Facebook/Instagram ਵਰਗੀ saved chat ਲਈ Supabase/Firebase backend database ਲਾਜ਼ਮੀ ਹੋਵੇਗਾ, ਤਾਂ ਕਿ ਹਰ client ਦਾ message owner ਨੂੰ live show ਹੋਵੇ ਅਤੇ updates ਬਾਅਦ ਵੀ save ਰਹੇ।
+      </div>
+    </div>
+  </div>
+
+
+    <nav class="mobile-bottom-nav">
+      <button onclick="showModule('dashboard')">⌂<span>Home</span></button>
+      <button onclick="showModule('measurement')">📐<span>ਮਿਣਤੀ</span></button>
+      <button onclick="showModule('theka')">🌾<span>ਠੇਕਾ</span></button>
+      <button onclick="showModule('sale')">💰<span>Sale</span></button>
+      <button onclick="openPrivateChat()">💬<span>Chat</span></button>
+    </nav>
+
+  <div id="ownerModeLoginModal" class="modal hidden">
+    <div class="modal-content owner-login-content">
+      <div class="modal-head">
+        <h2>Owner Login</h2>
+        <button onclick="closeOwnerModeLogin()">×</button>
+      </div>
+      <label>Owner Password</label>
+      <div class="password-eye-wrap">
+        <input id="ownerModePasswordInput" type="password" placeholder="Owner password">
+        <button type="button" onclick="togglePasswordEye('ownerModePasswordInput', this)">👁</button>
+      </div>
+      <div class="chat-actions">
+        <button class="primary" onclick="submitOwnerModeLogin()">Login Owner</button>
+        <button onclick="closeOwnerModeLogin()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase_config.js"></script>
+  <script src="supabase_integration.js"></script>
+
+<script>
+const SUPABASE_URL = "https://urofshdlhsoedzugzwxr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_baHPWsyz5K5l-ulx6k8rZw_2Ct48J72";
+
+const supabaseClient = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+console.log("✅ Supabase Connected Successfully");
+</script>
+
+
+<footer class="zm-footer-contact">
+  <div>
+    <b>Zameen Minti Project v39</b>
+    <p>Contact Email: <a href="mailto:dhaliwalballi18@gmail.com">dhaliwalballi18@gmail.com</a></p>
+    <p>Feedback / Suggestion 2026-27</p>
+  </div>
+  <div class="zm-footer-note">
+    © 2026-27 Zameen Minti / Theka Calculator. Client feedback, suggestions and future premium module requests are welcome.
+  </div>
+</footer>
+
+
+  <div id="voiceAssistantModal" class="modal hidden">
+    <div class="modal-content voice-assistant-content">
+      <div class="modal-head">
+        <h2>🎙️ Multilingual Voice Assistant</h2>
+        <button onclick="closeVoiceAssistant()">×</button>
+      </div>
+      <div class="voice-help-box">
+        <b>ਬੋਲ ਕੇ calculation ਕਰੋ:</b>
+        <p>Example: “42 ਕਨਾਲ 4 ਮਰਲੇ ਦਾ ਠੇਕਾ 80000 ਨਾਲ ਕੱਢੋ”</p>
+        <p>Punjabi / Hindi / English / Hinglish support browser speech engine ਤੇ depend ਕਰਦੀ ਹੈ।</p>
+      </div>
+      <div class="grid-2">
+        <label>Voice Language
+          <select id="voiceLangSelect">
+            <option value="pa-IN">Punjabi / ਪੰਜਾਬੀ</option>
+            <option value="hi-IN">Hindi / हिन्दी</option>
+            <option value="en-IN">English India</option>
+            <option value="en-US">English US</option>
+          </select>
+        </label>
+        <label>Command Type
+          <select id="voiceCommandType">
+            <option value="auto">Auto Detect</option>
+            <option value="theka">Theka Calculator</option>
+            <option value="measurement">Land Measurement</option>
+            <option value="sale">Sale Calculator</option>
+          </select>
+        </label>
+      </div>
+      <div class="voice-actions">
+        <button id="voiceStartBtn" class="primary" onclick="startVoiceAssistant()">🎙️ Start Listening</button>
+        <button onclick="stopVoiceAssistant()">⏹ Stop</button>
+        <button onclick="applyVoiceCommand()">✅ Apply</button>
+        <button onclick="clearVoiceText()">Clear</button>
+      </div>
+      <label>Recognized Voice Text</label>
+      <textarea id="voiceTextOutput" rows="4" placeholder="ਤੁਹਾਡੀ voice ਇੱਥੇ text ਵਿੱਚ ਆਵੇਗੀ..."></textarea>
+      <div id="voiceParsedPreview" class="voice-preview hidden"></div>
+      <div class="voice-examples">
+        <h3>Examples</h3>
+        <ul>
+          <li>42 ਕਨਾਲ 4 ਮਰਲੇ ਦਾ ਠੇਕਾ 80000 ਨਾਲ ਕੱਢੋ</li>
+          <li>Calculate theka 80000 for 42 kanal 4 marla</li>
+          <li>80 by 40 ਦੀ ਮਿਣਤੀ ਕੱਢੋ</li>
+          <li>Sale rate 5000000, 2 acre 3 kanal</li>
+        </ul>
       </div>
     </div>
   </div>

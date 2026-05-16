@@ -1368,3 +1368,1292 @@ function loadPrivateChat(){
 setTimeout(updateAdminUnreadBadge, 600);
 setInterval(updateAdminUnreadBadge, 5000);
 
+
+
+// -------- v19 Admin Login + Inbox Sync Fix --------
+const ADMIN_ID = "owner";
+
+function isAdminLoggedIn(){
+  return localStorage.getItem("zmAdminLoggedIn") === "yes";
+}
+
+function adminLogin(){
+  const id = document.getElementById("adminUserId")?.value.trim();
+  const pass = document.getElementById("adminUserPass")?.value.trim();
+
+  if(id !== ADMIN_ID || pass !== "owner123"){
+    alert("Admin ID ਜਾਂ password wrong ਹੈ।");
+    return;
+  }
+
+  localStorage.setItem("zmAdminLoggedIn", "yes");
+  document.getElementById("adminLoginBox").classList.add("hidden");
+  document.getElementById("adminInboxBox").classList.remove("hidden");
+  syncAllChatsToAdmin();
+  loadAdminInbox();
+}
+
+function openAdminInbox(){
+  document.getElementById("adminInboxModal").classList.remove("hidden");
+
+  if(isAdminLoggedIn()){
+    document.getElementById("adminLoginBox").classList.add("hidden");
+    document.getElementById("adminInboxBox").classList.remove("hidden");
+    syncAllChatsToAdmin();
+    loadAdminInbox();
+  }else{
+    document.getElementById("adminLoginBox").classList.remove("hidden");
+    document.getElementById("adminInboxBox").classList.add("hidden");
+  }
+}
+
+function sendPrivateChat(){
+  const m = currentMember();
+  if(!m) return openAuthModal();
+
+  const input = document.getElementById("privateChatInput");
+  const text = input.value.trim();
+  if(!text) return;
+
+  const chats = getChats();
+  chats[m.id] = chats[m.id] || [];
+
+  const msg = {
+    from:"client",
+    text:text,
+    time:new Date().toISOString(),
+    unreadForOwner:true,
+    memberId:m.id,
+    memberName:m.name || "",
+    memberMobile:m.mobile || "",
+    memberEmail:m.email || ""
+  };
+
+  chats[m.id].push(msg);
+  saveChats(chats);
+
+  const inbox = JSON.parse(localStorage.getItem("zmAdminInbox") || "[]");
+  inbox.unshift(msg);
+  localStorage.setItem("zmAdminInbox", JSON.stringify(inbox.slice(0,500)));
+
+  input.value = "";
+  loadPrivateChat();
+  updateAdminUnreadBadge();
+  alert("Message admin inbox ਵਿੱਚ save ਹੋ ਗਿਆ ਹੈ।");
+}
+
+function syncAllChatsToAdmin(){
+  const chats = getChats();
+  const members = getAllMembersForAdmin();
+  let inbox = [];
+
+  Object.keys(chats).forEach(id => {
+    const member = members.find(m => m.id === id) || {};
+    (chats[id] || []).forEach(m => {
+      if(m.from === "client"){
+        inbox.push({
+          ...m,
+          memberId:id,
+          memberName:m.memberName || member.name || "Client",
+          memberMobile:m.memberMobile || member.mobile || "",
+          memberEmail:m.memberEmail || member.email || ""
+        });
+      }
+    });
+  });
+
+  inbox.sort((a,b)=>new Date(b.time || 0)-new Date(a.time || 0));
+  localStorage.setItem("zmAdminInbox", JSON.stringify(inbox.slice(0,500)));
+  updateAdminUnreadBadge();
+}
+
+function loadAdminInbox(){
+  if(!isAdminLoggedIn()) return;
+
+  const list = document.getElementById("adminChatList");
+  if(!list) return;
+
+  syncAllChatsToAdmin();
+
+  const chats = getChats();
+  const ids = Object.keys(chats);
+
+  if(ids.length === 0){
+    list.innerHTML = '<div class="chat-note">ਹਾਲੇ ਕੋਈ client message ਨਹੀਂ ਆਇਆ।</div>';
+    document.getElementById("adminChatWindow").innerHTML = "";
+    updateAdminUnreadBadge();
+    return;
+  }
+
+  ids.sort((a,b)=>{
+    const ca = chats[a] || [];
+    const cb = chats[b] || [];
+    return new Date((cb[cb.length-1]||{}).time || 0) - new Date((ca[ca.length-1]||{}).time || 0);
+  });
+
+  list.innerHTML = ids.map(id=>{
+    const member = getClientNameById(id);
+    const chat = chats[id] || [];
+    const last = chat[chat.length-1] || {};
+    const unread = chat.filter(m => m.from === "client" && m.unreadForOwner).length;
+    const initial = (member.name || "C").charAt(0).toUpperCase();
+
+    return `
+      <button class="admin-client-row ${selectedAdminClientId === id ? "active" : ""}" onclick="selectAdminChat('${id}')">
+        <div class="avatar-circle">${initial}</div>
+        <div class="client-row-text">
+          <b>${member.name || "Client"}</b>
+          <span>${last.text ? last.text.slice(0,55) : "No message"}</span>
+          <small>${last.time ? new Date(last.time).toLocaleString() : ""}</small>
+        </div>
+        ${unread ? `<em>${unread}</em>` : ""}
+      </button>
+    `;
+  }).join("");
+
+  updateAdminUnreadBadge();
+}
+
+function updateAdminUnreadBadge(){
+  const badge = document.getElementById("adminUnreadBadge");
+  if(!badge) return;
+
+  const chats = getChats();
+  let total = 0;
+  Object.values(chats).forEach(list=>{
+    total += (list || []).filter(m => m.from === "client" && m.unreadForOwner).length;
+  });
+
+  if(total > 0){
+    badge.innerText = total;
+    badge.classList.remove("hidden");
+  }else{
+    badge.classList.add("hidden");
+  }
+}
+
+
+
+// -------- v24 Security added on top of working v19 --------
+// Keeps v19 working module/navigation structure. Adds local hashed admin password + change password.
+
+async function zmSha256(text){
+  const enc = new TextEncoder();
+  const data = enc.encode(text);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+async function zmGetAdminHash(){
+  let h = localStorage.getItem("zmAdminPassHash");
+  if(!h){
+    h = await zmSha256("owner123");
+    localStorage.setItem("zmAdminPassHash", h);
+  }
+  return h;
+}
+
+async function zmVerifyAdminPassword(pass){
+  const saved = await zmGetAdminHash();
+  const attempt = await zmSha256(pass);
+  return saved === attempt;
+}
+
+// Override v19 adminLogin only; no module navigation touched.
+async function adminLogin(){
+  const id = document.getElementById("adminUserId")?.value.trim();
+  const pass = document.getElementById("adminUserPass")?.value.trim();
+
+  if(id !== "owner" || !(await zmVerifyAdminPassword(pass))){
+    alert("Admin ID ਜਾਂ password wrong ਹੈ।");
+    return;
+  }
+
+  localStorage.setItem("zmAdminLoggedIn", "yes");
+  document.getElementById("adminLoginBox")?.classList.add("hidden");
+  document.getElementById("adminInboxBox")?.classList.remove("hidden");
+  document.getElementById("adminSecurityPanel")?.classList.remove("hidden");
+  if(typeof syncAllChatsToAdmin === "function") syncAllChatsToAdmin();
+  if(typeof loadAdminInbox === "function") loadAdminInbox();
+}
+
+function adminLogout(){
+  localStorage.removeItem("zmAdminLoggedIn");
+  document.getElementById("adminInboxBox")?.classList.add("hidden");
+  document.getElementById("adminSecurityPanel")?.classList.add("hidden");
+  document.getElementById("adminLoginBox")?.classList.remove("hidden");
+}
+
+function toggleAdminSecurity(){
+  const panel = document.getElementById("adminSecurityPanel");
+  if(!panel) return;
+  if(localStorage.getItem("zmAdminLoggedIn") !== "yes"){
+    alert("ਪਹਿਲਾਂ admin login ਕਰੋ।");
+    return;
+  }
+  panel.classList.toggle("hidden");
+}
+
+// Override v19 openAdminInbox only; no prompt, proper login panel.
+function openAdminInbox(){
+  document.getElementById("adminInboxModal")?.classList.remove("hidden");
+
+  if(localStorage.getItem("zmAdminLoggedIn") === "yes"){
+    document.getElementById("adminLoginBox")?.classList.add("hidden");
+    document.getElementById("adminInboxBox")?.classList.remove("hidden");
+    document.getElementById("adminSecurityPanel")?.classList.remove("hidden");
+    if(typeof syncAllChatsToAdmin === "function") syncAllChatsToAdmin();
+    if(typeof loadAdminInbox === "function") loadAdminInbox();
+  }else{
+    document.getElementById("adminLoginBox")?.classList.remove("hidden");
+    document.getElementById("adminInboxBox")?.classList.add("hidden");
+    document.getElementById("adminSecurityPanel")?.classList.add("hidden");
+  }
+}
+
+async function changeAdminPassword(){
+  const current = document.getElementById("adminCurrentPass")?.value.trim();
+  const next = document.getElementById("adminNewPass")?.value.trim();
+
+  if(!current || !next){
+    alert("Current ਤੇ new password ਦੋਵੇਂ ਭਰੋ।");
+    return;
+  }
+  if(next.length < 6){
+    alert("New password ਘੱਟੋ-ਘੱਟ 6 characters ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।");
+    return;
+  }
+  if(!(await zmVerifyAdminPassword(current))){
+    alert("Current password wrong ਹੈ।");
+    return;
+  }
+
+  const newHash = await zmSha256(next);
+  localStorage.setItem("zmAdminPassHash", newHash);
+  document.getElementById("adminCurrentPass").value = "";
+  document.getElementById("adminNewPass").value = "";
+  alert("Admin password change ਹੋ ਗਿਆ ਹੈ।");
+}
+
+// Safe extra module open only for added backendSecurity module, preserves old v19 showModule for other modules.
+function showModuleSafeV24(name){
+  if(name === "backendSecurity"){
+    const all = ["dashboardModule","measurementModule","thekaModule","saleModule","registryModule","reportsModule","adminModule","gpsModule","backendSecurityModule"];
+    all.forEach(id => document.getElementById(id)?.classList.add("hidden"));
+    document.getElementById("backendSecurityModule")?.classList.remove("hidden");
+    window.scrollTo({top:0, behavior:"smooth"});
+    return;
+  }
+  if(typeof showModule === "function") showModule(name);
+}
+
+
+
+// -------- v26 Owner/Client UI Separation --------
+function isOwnerMode(){
+  return localStorage.getItem("zmOwnerMode") === "yes" || localStorage.getItem("zmAdminLoggedIn") === "yes";
+}
+function applyOwnerClientUI(){
+  const owner = isOwnerMode();
+  document.querySelectorAll(".owner-only").forEach(el => el.classList.toggle("hidden", !owner));
+  if(!owner){
+    ["adminModule","backendSecurityModule"].forEach(id => document.getElementById(id)?.classList.add("hidden"));
+  }
+  const btn = document.getElementById("ownerModeBtn");
+  if(btn){
+    btn.innerHTML = owner ? "🔓 Owner Mode" : "🔐 Owner";
+    btn.classList.toggle("active-owner", owner);
+  }
+}
+async function ownerModeLogin(){
+  if(isOwnerMode()){
+    if(confirm("Owner mode logout ਕਰਨਾ ਹੈ?")){
+      localStorage.removeItem("zmOwnerMode");
+      localStorage.removeItem("zmAdminLoggedIn");
+      applyOwnerClientUI();
+      if(typeof showModule === "function") showModule("dashboard");
+    }
+    return;
+  }
+  const pass = prompt("Owner password ਭਰੋ:");
+  if(!pass) return;
+  let ok = false;
+  try{
+    if(typeof zmVerifyAdminPassword === "function") ok = await zmVerifyAdminPassword(pass);
+    else ok = pass === "owner123";
+  }catch(e){ ok = pass === "owner123"; }
+  if(!ok) return alert("Wrong owner password");
+  localStorage.setItem("zmOwnerMode", "yes");
+  localStorage.setItem("zmAdminLoggedIn", "yes");
+  applyOwnerClientUI();
+  alert("Owner mode active ਹੋ ਗਿਆ ਹੈ।");
+}
+const oldAdminLoginV26 = window.adminLogin;
+window.adminLogin = async function(){
+  if(typeof oldAdminLoginV26 === "function") await oldAdminLoginV26();
+  if(localStorage.getItem("zmAdminLoggedIn") === "yes"){
+    localStorage.setItem("zmOwnerMode", "yes");
+    applyOwnerClientUI();
+  }
+};
+const oldShowModuleV26 = window.showModule;
+window.showModule = function(name){
+  if((name === "admin" || name === "backendSecurity") && !isOwnerMode()){
+    alert("ਇਹ Owner/Admin area ਹੈ। ਪਹਿਲਾਂ Owner login ਕਰੋ।");
+    return;
+  }
+  if(typeof oldShowModuleV26 === "function") oldShowModuleV26(name);
+  applyOwnerClientUI();
+};
+document.addEventListener("DOMContentLoaded", function(){ setTimeout(applyOwnerClientUI, 300); });
+setTimeout(applyOwnerClientUI, 500);
+
+
+
+// -------- v28 Real Map Polygon Measurement --------
+// Free map uses Leaflet + OpenStreetMap. Google Maps can be added later with an API key.
+
+let zmMap = null;
+let zmMapPoints = [];
+let zmMapMarkers = [];
+let zmMapPolygon = null;
+
+function initRealMap(){
+  const mapBox = document.getElementById("realMap");
+  if(!mapBox) return;
+
+  if(typeof L === "undefined"){
+    mapBox.innerHTML = `<div class="map-loading-note">Map library load ਨਹੀਂ ਹੋਈ। Internet connection check ਕਰੋ ਜਾਂ online site ਤੇ open ਕਰੋ।</div>`;
+    return;
+  }
+
+  if(zmMap){
+    setTimeout(() => zmMap.invalidateSize(), 200);
+    return;
+  }
+
+  mapBox.innerHTML = "";
+  zmMap = L.map("realMap").setView([30.7333, 76.7794], 13); // Punjab/Chandigarh default
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 22,
+    attribution: "© OpenStreetMap"
+  }).addTo(zmMap);
+
+  zmMap.on("click", function(e){
+    addMapPoint(e.latlng);
+  });
+
+  setTimeout(() => zmMap.invalidateSize(), 400);
+}
+
+function locateMeOnMap(){
+  initRealMap();
+  if(!navigator.geolocation){
+    alert("Geolocation supported ਨਹੀਂ।");
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    zmMap.setView([lat, lng], 18);
+    L.circleMarker([lat,lng], {radius:8}).addTo(zmMap).bindPopup("Your location").openPopup();
+  }, () => alert("Location permission ਨਹੀਂ ਮਿਲੀ।"));
+}
+
+function addMapPoint(latlng){
+  if(!zmMap) return;
+  zmMapPoints.push(latlng);
+
+  const marker = L.marker(latlng, {title:`Point ${zmMapPoints.length}`}).addTo(zmMap);
+  marker.bindTooltip(String.fromCharCode(64 + zmMapPoints.length), {permanent:true, direction:"top"});
+  zmMapMarkers.push(marker);
+
+  drawMapPolygon();
+}
+
+function drawMapPolygon(){
+  if(!zmMap) return;
+  if(zmMapPolygon){
+    zmMap.removeLayer(zmMapPolygon);
+    zmMapPolygon = null;
+  }
+  if(zmMapPoints.length >= 3){
+    zmMapPolygon = L.polygon(zmMapPoints, {
+      color:"#0f6b3a",
+      weight:3,
+      fillColor:"#0f6b3a",
+      fillOpacity:0.18
+    }).addTo(zmMap);
+  }else if(zmMapPoints.length >= 2){
+    zmMapPolygon = L.polyline(zmMapPoints, {color:"#0f6b3a", weight:3}).addTo(zmMap);
+  }
+}
+
+function undoMapPoint(){
+  if(!zmMap || zmMapPoints.length === 0) return;
+  zmMapPoints.pop();
+  const marker = zmMapMarkers.pop();
+  if(marker) zmMap.removeLayer(marker);
+  drawMapPolygon();
+}
+
+function clearMapPolygon(){
+  if(!zmMap) return;
+  zmMapPoints = [];
+  zmMapMarkers.forEach(m => zmMap.removeLayer(m));
+  zmMapMarkers = [];
+  if(zmMapPolygon) zmMap.removeLayer(zmMapPolygon);
+  zmMapPolygon = null;
+  document.getElementById("gpsResult")?.classList.add("hidden");
+}
+
+function radians(deg){ return deg * Math.PI / 180; }
+
+// Approx spherical polygon area in square meters
+function polygonAreaSqMeters(latlngs){
+  if(latlngs.length < 3) return 0;
+  const R = 6378137;
+  let area = 0;
+
+  for(let i=0; i<latlngs.length; i++){
+    const p1 = latlngs[i];
+    const p2 = latlngs[(i+1) % latlngs.length];
+    area += radians(p2.lng - p1.lng) * (2 + Math.sin(radians(p1.lat)) + Math.sin(radians(p2.lat)));
+  }
+
+  area = area * R * R / 2;
+  return Math.abs(area);
+}
+
+function calculateMapPolygonArea(){
+  const s = getSettings ? getSettings() : {marlaSqft:272.25, kanalSqft:5445, acreSqft:43560};
+
+  if(zmMapPoints.length < 3){
+    alert("ਘੱਟੋ-ਘੱਟ 3 points add ਕਰੋ।");
+    return;
+  }
+
+  const sqMeters = polygonAreaSqMeters(zmMapPoints);
+  const sqFt = sqMeters * 10.76391041671;
+  const marla = sqFt / s.marlaSqft;
+  const kanal = sqFt / s.kanalSqft;
+  const acre = sqFt / s.acreSqft;
+  const vishve = acre * (s.acreVishwasian || 96);
+
+  const box = document.getElementById("gpsResult");
+  box.innerHTML = `
+    <div class="theka-result-head">
+      <div>
+        <h2>🌍 Real Map Polygon Result</h2>
+        <p><b>Points:</b> ${zmMapPoints.length} | <b>Area:</b> ${round(sqMeters)} sq meter</p>
+      </div>
+      <div class="result-actions">
+        <button class="whatsapp-btn" onclick="shareCurrentResult()">🟢 Share</button>
+        <button onclick="printOnly('gpsResult','Map Polygon Land Report')">🖨 Print</button>
+      </div>
+    </div>
+
+    <div class="gps-stat-grid">
+      <div class="gps-stat"><span>Square Feet</span><b>${round(sqFt)}</b></div>
+      <div class="gps-stat"><span>ਮਰਲੇ</span><b>${round(marla)}</b></div>
+      <div class="gps-stat"><span>ਕਨਾਲ</span><b>${round(kanal)}</b></div>
+      <div class="gps-stat"><span>ਏਕੜ/ਕਿੱਲਾ</span><b>${round(acre)}</b></div>
+      <div class="gps-stat"><span>ਵਿਸ਼ਵੇ</span><b>${round(vishve)}</b></div>
+      <div class="gps-stat"><span>Sq Meter</span><b>${round(sqMeters)}</b></div>
+    </div>
+
+    <div class="note-card" style="margin-top:16px">
+      📍 ਇਹ map measurement approximate ਹੈ। Legal/registry work ਲਈ official survey measurement ਲਾਜ਼ਮੀ ਹੈ।
+    </div>
+  `;
+  box.classList.remove("hidden");
+
+  if(typeof saveLocalReport === "function"){
+    saveLocalReport("Map Polygon Measurement", {
+      points: zmMapPoints.map(p => ({lat:p.lat, lng:p.lng})),
+      sqMeters, sqFt, marla, kanal, acre, vishve
+    });
+  }
+}
+
+// When GPS module opens, map size refresh
+const oldShowModuleV28 = window.showModule;
+window.showModule = function(name){
+  if(typeof oldShowModuleV28 === "function") oldShowModuleV28(name);
+  if(name === "gps"){
+    setTimeout(() => {
+      if(zmMap) zmMap.invalidateSize();
+    }, 400);
+  }
+};
+
+
+
+// -------- v29 Map Search + Distance Measurement --------
+let zmMapMode = "area";
+let zmDistanceLine = null;
+
+function setMapMode(mode){
+  zmMapMode = mode;
+  const areaBtn = document.getElementById("areaModeBtn");
+  const distBtn = document.getElementById("distanceModeBtn");
+  if(areaBtn && distBtn){
+    areaBtn.classList.toggle("primary", mode === "area");
+    distBtn.classList.toggle("primary", mode === "distance");
+  }
+  if(mode === "distance"){
+    alert("Distance Mode: map ਤੇ 2 points click ਕਰੋ, ਫਿਰ Calculate Distance.");
+  }else{
+    alert("Area Mode: ਜ਼ਮੀਨ ਦੇ corner points click ਕਰੋ, ਫਿਰ Calculate Area.");
+  }
+}
+
+// Override addMapPoint from v28 to support area/distance modes
+function addMapPoint(latlng){
+  if(!zmMap) return;
+
+  if(zmMapMode === "distance" && zmMapPoints.length >= 2){
+    clearMapPolygon();
+  }
+
+  zmMapPoints.push(latlng);
+
+  const label = zmMapMode === "distance" ? (zmMapPoints.length === 1 ? "A" : "B") : String.fromCharCode(64 + zmMapPoints.length);
+  const marker = L.marker(latlng, {title:`Point ${label}`}).addTo(zmMap);
+  marker.bindTooltip(label, {permanent:true, direction:"top"});
+  zmMapMarkers.push(marker);
+
+  if(zmMapMode === "distance") drawDistanceLine();
+  else drawMapPolygon();
+}
+
+function drawDistanceLine(){
+  if(!zmMap) return;
+  if(zmDistanceLine){
+    zmMap.removeLayer(zmDistanceLine);
+    zmDistanceLine = null;
+  }
+  if(zmMapPoints.length >= 2){
+    zmDistanceLine = L.polyline([zmMapPoints[0], zmMapPoints[1]], {
+      color:"#1669c7",
+      weight:4,
+      dashArray:"8,8"
+    }).addTo(zmMap);
+  }
+}
+
+function clearMapPolygon(){
+  if(!zmMap) return;
+  zmMapPoints = [];
+  zmMapMarkers.forEach(m => zmMap.removeLayer(m));
+  zmMapMarkers = [];
+  if(zmMapPolygon) zmMap.removeLayer(zmMapPolygon);
+  if(zmDistanceLine) zmMap.removeLayer(zmDistanceLine);
+  zmMapPolygon = null;
+  zmDistanceLine = null;
+  document.getElementById("gpsResult")?.classList.add("hidden");
+}
+
+function undoMapPoint(){
+  if(!zmMap || zmMapPoints.length === 0) return;
+  zmMapPoints.pop();
+  const marker = zmMapMarkers.pop();
+  if(marker) zmMap.removeLayer(marker);
+  if(zmMapMode === "distance") drawDistanceLine();
+  else drawMapPolygon();
+}
+
+function haversineMeters(p1,p2){
+  const R = 6371000;
+  const dLat = radians(p2.lat - p1.lat);
+  const dLng = radians(p2.lng - p1.lng);
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(radians(p1.lat)) * Math.cos(radians(p2.lat)) *
+            Math.sin(dLng/2) * Math.sin(dLng/2);
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function calculateMapDistance(){
+  if(zmMapPoints.length < 2){
+    alert("Distance ਲਈ 2 points click ਕਰੋ।");
+    return;
+  }
+
+  const meters = haversineMeters(zmMapPoints[0], zmMapPoints[1]);
+  const feet = meters * 3.280839895;
+  const km = meters / 1000;
+  const miles = meters / 1609.344;
+  const karam = feet / (getSettings().karamFeet || 5.5);
+
+  const box = document.getElementById("gpsResult");
+  box.innerHTML = `
+    <div class="theka-result-head">
+      <div>
+        <h2>📏 Distance Result</h2>
+        <p><b>Point A ਤੋਂ Point B ਤੱਕ distance</b></p>
+      </div>
+      <div class="result-actions">
+        <button class="whatsapp-btn" onclick="shareCurrentResult()">🟢 Share</button>
+        <button onclick="printOnly('gpsResult','Map Distance Report')">🖨 Print</button>
+      </div>
+    </div>
+
+    <div class="gps-stat-grid">
+      <div class="gps-stat"><span>Feet</span><b>${round(feet)}</b></div>
+      <div class="gps-stat"><span>Meter</span><b>${round(meters)}</b></div>
+      <div class="gps-stat"><span>Kilometer</span><b>${round(km)}</b></div>
+      <div class="gps-stat"><span>Mile</span><b>${round(miles)}</b></div>
+      <div class="gps-stat"><span>ਕਰਮ</span><b>${round(karam)}</b></div>
+    </div>
+
+    <div class="note-card" style="margin-top:16px">
+      📍 ਇਹ distance approximate ਹੈ। Legal/survey ਲਈ official measurement ਜ਼ਰੂਰੀ ਹੈ।
+    </div>
+  `;
+  box.classList.remove("hidden");
+
+  if(typeof saveLocalReport === "function"){
+    saveLocalReport("Map Distance Measurement", {
+      pointA: {lat:zmMapPoints[0].lat, lng:zmMapPoints[0].lng},
+      pointB: {lat:zmMapPoints[1].lat, lng:zmMapPoints[1].lng},
+      feet, meters, km, miles, karam
+    });
+  }
+}
+
+async function searchMapPlace(){
+  const q = document.getElementById("mapSearchInput")?.value.trim();
+  if(!q) return alert("Search ਲਈ place/area name ਲਿਖੋ।");
+
+  initRealMap();
+
+  const resultsBox = document.getElementById("mapSearchResults");
+  resultsBox.classList.remove("hidden");
+  resultsBox.innerHTML = `<div class="map-result-loading">Searching...</div>`;
+
+  try{
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=6&addressdetails=1&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url, {headers: {"Accept":"application/json"}});
+    const data = await res.json();
+
+    if(!data || data.length === 0){
+      resultsBox.innerHTML = `<div class="note-card">ਕੋਈ result ਨਹੀਂ ਮਿਲਿਆ। Search words ਬਦਲ ਕੇ try ਕਰੋ।</div>`;
+      return;
+    }
+
+    resultsBox.innerHTML = data.map((r,idx)=>`
+      <button class="map-search-result" onclick="goToSearchResult(${idx})" data-lat="${r.lat}" data-lon="${r.lon}" data-name="${encodeURIComponent(r.display_name)}">
+        <b>${r.display_name.split(",").slice(0,2).join(", ")}</b>
+        <span>${r.display_name}</span>
+      </button>
+    `).join("");
+
+  }catch(e){
+    resultsBox.innerHTML = `<div class="note-card">Search service load ਨਹੀਂ ਹੋਈ। Internet ਤੇ online site ਤੇ try ਕਰੋ।</div>`;
+  }
+}
+
+function goToSearchResult(index){
+  const btn = document.querySelectorAll(".map-search-result")[index];
+  if(!btn || !zmMap) return;
+
+  const lat = parseFloat(btn.dataset.lat);
+  const lon = parseFloat(btn.dataset.lon);
+  const name = decodeURIComponent(btn.dataset.name || "");
+
+  zmMap.setView([lat, lon], 16);
+  L.marker([lat, lon]).addTo(zmMap).bindPopup(name).openPopup();
+}
+
+
+
+// -------- v30 Google-Maps-style live search suggestions --------
+let liveSuggestTimer = null;
+let liveSuggestAbort = null;
+let liveSuggestData = [];
+let recentMapSearches = JSON.parse(localStorage.getItem("zmRecentMapSearches") || "[]");
+
+function normalizeSearchTerm(q){
+  return (q || "").trim().replace(/\s+/g, " ");
+}
+
+function initLiveMapSearch(){
+  const input = document.getElementById("mapSearchInput");
+  const box = document.getElementById("liveMapSuggestions");
+  if(!input || !box) return;
+
+  input.addEventListener("input", function(){
+    const q = normalizeSearchTerm(input.value);
+
+    clearTimeout(liveSuggestTimer);
+
+    if(q.length < 2){
+      renderRecentMapSuggestions();
+      return;
+    }
+
+    liveSuggestTimer = setTimeout(() => fetchLiveMapSuggestions(q), 350);
+  });
+
+  input.addEventListener("focus", function(){
+    const q = normalizeSearchTerm(input.value);
+    if(q.length < 2) renderRecentMapSuggestions();
+    else fetchLiveMapSuggestions(q);
+  });
+
+  input.addEventListener("keydown", function(e){
+    const items = Array.from(document.querySelectorAll(".live-suggestion-item"));
+    if(!items.length) return;
+
+    let active = items.findIndex(x => x.classList.contains("active"));
+    if(e.key === "ArrowDown"){
+      e.preventDefault();
+      active = (active + 1) % items.length;
+      items.forEach(x => x.classList.remove("active"));
+      items[active].classList.add("active");
+    }else if(e.key === "ArrowUp"){
+      e.preventDefault();
+      active = active <= 0 ? items.length - 1 : active - 1;
+      items.forEach(x => x.classList.remove("active"));
+      items[active].classList.add("active");
+    }else if(e.key === "Enter"){
+      const selected = items[active >= 0 ? active : 0];
+      if(selected){
+        e.preventDefault();
+        selected.click();
+      }
+    }else if(e.key === "Escape"){
+      hideLiveMapSuggestions();
+    }
+  });
+
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".live-search-wrap")){
+      hideLiveMapSuggestions();
+    }
+  });
+}
+
+function hideLiveMapSuggestions(){
+  const box = document.getElementById("liveMapSuggestions");
+  if(box) box.classList.add("hidden");
+}
+
+function renderRecentMapSuggestions(){
+  const box = document.getElementById("liveMapSuggestions");
+  if(!box) return;
+
+  if(!recentMapSearches.length){
+    box.innerHTML = `<div class="suggestion-empty">Search place name — live suggestions ਇੱਥੇ ਆਉਣਗੀਆਂ।</div>`;
+    box.classList.remove("hidden");
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="suggestion-title">Recent Searches</div>
+    ${recentMapSearches.slice(0,5).map((r,idx)=>`
+      <button class="live-suggestion-item recent" onclick="selectLiveSuggestionFromRecent(${idx})">
+        <span class="suggestion-icon">🕘</span>
+        <span><b>${r.short}</b><small>${r.full}</small></span>
+      </button>
+    `).join("")}
+  `;
+  box.classList.remove("hidden");
+}
+
+async function fetchLiveMapSuggestions(q){
+  const box = document.getElementById("liveMapSuggestions");
+  if(!box) return;
+
+  if(liveSuggestAbort) liveSuggestAbort.abort();
+  liveSuggestAbort = new AbortController();
+
+  box.innerHTML = `<div class="suggestion-loading">Searching “${q}”...</div>`;
+  box.classList.remove("hidden");
+
+  try{
+    // Add Punjab/India context for better village results if user did not type it.
+    const contextualQ = /punjab|india|haryana|rajasthan|delhi/i.test(q) ? q : `${q} Punjab India`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=8&addressdetails=1&accept-language=en&q=${encodeURIComponent(contextualQ)}`;
+    const res = await fetch(url, {
+      signal: liveSuggestAbort.signal,
+      headers: {"Accept":"application/json"}
+    });
+    const data = await res.json();
+    liveSuggestData = data || [];
+
+    if(!liveSuggestData.length){
+      box.innerHTML = `
+        <div class="suggestion-empty">
+          ਕੋਈ result ਨਹੀਂ ਮਿਲਿਆ। Spelling ਬਦਲ ਕੇ try ਕਰੋ ਜਾਂ district ਨਾਲ ਲਿਖੋ।
+          <br><small>Example: “Mohar Singh Wala Mansa Punjab”</small>
+        </div>`;
+      return;
+    }
+
+    box.innerHTML = liveSuggestData.map((r,idx)=>{
+      const address = r.address || {};
+      const primary = address.village || address.town || address.city || address.hamlet || address.suburb || address.county || r.name || r.display_name.split(",")[0];
+      const type = r.type ? r.type.replace(/_/g," ") : "place";
+      const detail = r.display_name;
+      return `
+        <button class="live-suggestion-item" onclick="selectLiveSuggestion(${idx})">
+          <span class="suggestion-icon">📍</span>
+          <span>
+            <b>${primary}</b>
+            <small>${detail}</small>
+            <em>${type}</em>
+          </span>
+        </button>
+      `;
+    }).join("");
+
+  }catch(e){
+    if(e.name === "AbortError") return;
+    box.innerHTML = `<div class="suggestion-empty">Internet/search service issue. Online site ਤੇ try ਕਰੋ।</div>`;
+  }
+}
+
+function selectLiveSuggestion(idx){
+  const r = liveSuggestData[idx];
+  if(!r) return;
+
+  const input = document.getElementById("mapSearchInput");
+  const address = r.address || {};
+  const primary = address.village || address.town || address.city || address.hamlet || address.suburb || address.county || r.name || r.display_name.split(",")[0];
+
+  if(input) input.value = primary;
+  hideLiveMapSuggestions();
+  goToLivePlace(r);
+  saveRecentMapSearch(primary, r.display_name, r.lat, r.lon);
+}
+
+function selectLiveSuggestionFromRecent(idx){
+  const r = recentMapSearches[idx];
+  if(!r) return;
+  const input = document.getElementById("mapSearchInput");
+  if(input) input.value = r.short;
+  hideLiveMapSuggestions();
+  goToLivePlace({lat:r.lat, lon:r.lon, display_name:r.full});
+}
+
+function saveRecentMapSearch(short, full, lat, lon){
+  recentMapSearches = recentMapSearches.filter(x => x.full !== full);
+  recentMapSearches.unshift({short, full, lat, lon, time:Date.now()});
+  recentMapSearches = recentMapSearches.slice(0,8);
+  localStorage.setItem("zmRecentMapSearches", JSON.stringify(recentMapSearches));
+}
+
+function goToLivePlace(r){
+  initRealMap();
+
+  const lat = parseFloat(r.lat);
+  const lon = parseFloat(r.lon);
+  const name = r.display_name || "Selected place";
+
+  if(!zmMap || isNaN(lat) || isNaN(lon)) return;
+
+  zmMap.setView([lat, lon], 16);
+
+  const marker = L.marker([lat, lon]).addTo(zmMap);
+  marker.bindPopup(`
+    <b>${name.split(",").slice(0,2).join(", ")}</b><br>
+    <small>${name}</small><br>
+    <button onclick="startAreaFromSearch(${lat},${lon})">ਇੱਥੇ ਤੋਂ Area Start</button>
+  `).openPopup();
+
+  const resultBox = document.getElementById("mapSearchResults");
+  if(resultBox){
+    resultBox.classList.remove("hidden");
+    resultBox.innerHTML = `
+      <div class="selected-place-card">
+        <b>Selected Place</b>
+        <span>${name}</span>
+        <small>Lat: ${lat.toFixed(6)}, Lng: ${lon.toFixed(6)}</small>
+      </div>
+    `;
+  }
+}
+
+function startAreaFromSearch(lat,lng){
+  setMapMode("area");
+  clearMapPolygon();
+  addMapPoint(L.latLng(lat,lng));
+}
+
+// Override normal search button to use first live result if available
+async function searchMapPlace(){
+  const q = normalizeSearchTerm(document.getElementById("mapSearchInput")?.value);
+  if(!q) return alert("Search ਲਈ place/area name ਲਿਖੋ।");
+
+  await fetchLiveMapSuggestions(q);
+  if(liveSuggestData && liveSuggestData.length){
+    selectLiveSuggestion(0);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  setTimeout(initLiveMapSearch, 400);
+});
+setTimeout(initLiveMapSearch, 800);
+
+
+
+// -------- v31 Selected place shown top + bottom --------
+// Keeps selected place visible above map and below map.
+
+function renderSelectedPlaceCards(name, lat, lon){
+  const shortName = (name || "").split(",").slice(0,2).join(", ");
+  const cardHTML = `
+    <div class="selected-place-card selected-place-highlight">
+      <div>
+        <b>📍 Selected Place</b>
+        <span>${name}</span>
+        <small>Lat: ${Number(lat).toFixed(6)}, Lng: ${Number(lon).toFixed(6)}</small>
+      </div>
+      <button onclick="startAreaFromSearch(${lat},${lon})">ਇੱਥੇ ਤੋਂ Area Start</button>
+    </div>
+  `;
+
+  const top = document.getElementById("selectedPlaceTop");
+  if(top){
+    top.innerHTML = cardHTML;
+    top.classList.remove("hidden");
+  }
+
+  const bottom = document.getElementById("mapSearchResults");
+  if(bottom){
+    bottom.classList.remove("hidden");
+    bottom.innerHTML = cardHTML;
+  }
+}
+
+// Override place selection display from v30
+function goToLivePlace(r){
+  initRealMap();
+
+  const lat = parseFloat(r.lat);
+  const lon = parseFloat(r.lon);
+  const name = r.display_name || "Selected place";
+
+  if(!zmMap || isNaN(lat) || isNaN(lon)) return;
+
+  zmMap.setView([lat, lon], 16);
+
+  L.marker([lat, lon]).addTo(zmMap).bindPopup(`
+    <b>${name.split(",").slice(0,2).join(", ")}</b><br>
+    <small>${name}</small><br>
+    <button onclick="startAreaFromSearch(${lat},${lon})">ਇੱਥੇ ਤੋਂ Area Start</button>
+  `).openPopup();
+
+  renderSelectedPlaceCards(name, lat, lon);
+}
+
+
+
+// -------- v32 custom password modal + eye toggle --------
+function togglePasswordEye(inputId, btn){
+  const input = document.getElementById(inputId);
+  if(!input) return;
+  if(input.type === "password"){
+    input.type = "text";
+    if(btn) btn.textContent = "🙈";
+  }else{
+    input.type = "password";
+    if(btn) btn.textContent = "👁";
+  }
+}
+
+function closeOwnerModeLogin(){
+  document.getElementById("ownerModeLoginModal")?.classList.add("hidden");
+  const input = document.getElementById("ownerModePasswordInput");
+  if(input) input.value = "";
+}
+
+// Override ownerModeLogin to avoid browser prompt showing password clearly
+async function ownerModeLogin(){
+  if(typeof isOwnerMode === "function" && isOwnerMode()){
+    if(confirm("Owner mode logout ਕਰਨਾ ਹੈ?")){
+      localStorage.removeItem("zmOwnerMode");
+      localStorage.removeItem("zmAdminLoggedIn");
+      if(typeof applyOwnerClientUI === "function") applyOwnerClientUI();
+      if(typeof showModule === "function") showModule("dashboard");
+    }
+    return;
+  }
+
+  const modal = document.getElementById("ownerModeLoginModal");
+  if(modal){
+    modal.classList.remove("hidden");
+    setTimeout(()=>document.getElementById("ownerModePasswordInput")?.focus(), 100);
+  }
+}
+
+async function submitOwnerModeLogin(){
+  const input = document.getElementById("ownerModePasswordInput");
+  const pass = input?.value || "";
+  if(!pass) return alert("Owner password ਭਰੋ।");
+
+  let ok = false;
+  try{
+    if(typeof zmVerifyAdminPassword === "function") ok = await zmVerifyAdminPassword(pass);
+    else ok = pass === "owner123";
+  }catch(e){
+    ok = pass === "owner123";
+  }
+
+  if(!ok) return alert("Wrong owner password");
+
+  localStorage.setItem("zmOwnerMode", "yes");
+  localStorage.setItem("zmAdminLoggedIn", "yes");
+  closeOwnerModeLogin();
+  if(typeof applyOwnerClientUI === "function") applyOwnerClientUI();
+  alert("Owner mode active ਹੋ ਗਿਆ ਹੈ।");
+}
+
+
+
+// -------- v33 Map Layers: Street / Satellite / Hybrid / Topo --------
+let zmCurrentBaseLayer = null;
+let zmLabelLayer = null;
+let zmLayerMode = "street";
+
+function getMapLayerDefs(){
+  return {
+    street: {
+      name: "Street",
+      tile: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      options: { maxZoom: 22, attribution: "© OpenStreetMap" }
+    },
+    satellite: {
+      name: "Satellite",
+      tile: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      options: { maxZoom: 20, attribution: "Tiles © Esri" }
+    },
+    hybrid: {
+      name: "Hybrid",
+      tile: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      options: { maxZoom: 20, attribution: "Tiles © Esri" }
+    },
+    topo: {
+      name: "Topo",
+      tile: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      options: { maxZoom: 17, attribution: "© OpenTopoMap" }
+    }
+  };
+}
+
+function setMapLayer(mode){
+  zmLayerMode = mode;
+  initRealMap();
+
+  const defs = getMapLayerDefs();
+  const def = defs[mode] || defs.street;
+
+  if(zmCurrentBaseLayer && zmMap){
+    zmMap.removeLayer(zmCurrentBaseLayer);
+  }
+  if(zmLabelLayer && zmMap){
+    zmMap.removeLayer(zmLabelLayer);
+    zmLabelLayer = null;
+  }
+
+  zmCurrentBaseLayer = L.tileLayer(def.tile, def.options).addTo(zmMap);
+
+  // Hybrid = Satellite + labels/roads overlay
+  if(mode === "hybrid"){
+    zmLabelLayer = L.tileLayer("https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 20,
+      attribution: "Labels © Esri"
+    }).addTo(zmMap);
+  }
+
+  ["street","satellite","hybrid","topo"].forEach(x => {
+    const btn = document.getElementById(x === "street" ? "streetLayerBtn" : x === "satellite" ? "satLayerBtn" : x === "hybrid" ? "hybridLayerBtn" : "topoLayerBtn");
+    if(btn) btn.classList.toggle("primary", x === mode);
+  });
+
+  setTimeout(() => zmMap.invalidateSize(), 200);
+}
+
+// Override initRealMap so first load uses selected layer system
+function initRealMap(){
+  const mapBox = document.getElementById("realMap");
+  if(!mapBox) return;
+
+  if(typeof L === "undefined"){
+    mapBox.innerHTML = `<div class="map-loading-note">Map library load ਨਹੀਂ ਹੋਈ। Internet connection check ਕਰੋ ਜਾਂ online site ਤੇ open ਕਰੋ।</div>`;
+    return;
+  }
+
+  if(zmMap){
+    setTimeout(() => zmMap.invalidateSize(), 200);
+    return;
+  }
+
+  mapBox.innerHTML = "";
+  zmMap = L.map("realMap", {
+    zoomControl: true
+  }).setView([30.7333, 76.7794], 13);
+
+  setMapLayer(zmLayerMode || "street");
+
+  // Helpful scale like Google Maps bottom scale
+  if(!document.querySelector(".leaflet-control-scale")){
+    L.control.scale({imperial:true, metric:true}).addTo(zmMap);
+  }
+
+  zmMap.on("click", function(e){
+    addMapPoint(e.latlng);
+  });
+
+  setTimeout(() => zmMap.invalidateSize(), 400);
+}
+
+
+
+// v37 module drawer
+function toggleModuleDrawer(){
+  const drawer = document.getElementById("moduleDrawer");
+  if(drawer) drawer.classList.toggle("hidden");
+}
+document.addEventListener("click", function(e){
+  const drawer = document.getElementById("moduleDrawer");
+  const btn = document.getElementById("moduleMenuBtn");
+  if(!drawer || drawer.classList.contains("hidden")) return;
+  if(e.target === btn || btn?.contains(e.target) || drawer.contains(e.target)) return;
+  drawer.classList.add("hidden");
+});
+
+
+// =========================================================
+// Zameen Minti Project v39 - Multilingual Voice Assistant
+// =========================================================
+let zmVoiceRecognition = null;
+let zmVoiceListening = false;
+let zmLastParsedVoice = null;
+
+function openVoiceAssistant(){
+  document.getElementById("voiceAssistantModal")?.classList.remove("hidden");
+}
+function closeVoiceAssistant(){
+  stopVoiceAssistant();
+  document.getElementById("voiceAssistantModal")?.classList.add("hidden");
+}
+function clearVoiceText(){
+  const t = document.getElementById("voiceTextOutput");
+  const p = document.getElementById("voiceParsedPreview");
+  if(t) t.value = "";
+  if(p){ p.innerHTML = ""; p.classList.add("hidden"); }
+  zmLastParsedVoice = null;
+}
+function getSpeechRecognition(){
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+function startVoiceAssistant(){
+  const SR = getSpeechRecognition();
+  if(!SR){
+    alert("ਤੁਹਾਡੇ browser ਵਿੱਚ Speech Recognition support ਨਹੀਂ। Chrome/Edge ਵਰਤ ਕੇ try ਕਰੋ।");
+    return;
+  }
+  stopVoiceAssistant();
+  const lang = document.getElementById("voiceLangSelect")?.value || "pa-IN";
+  const output = document.getElementById("voiceTextOutput");
+  const btn = document.getElementById("voiceStartBtn");
+  zmVoiceRecognition = new SR();
+  zmVoiceRecognition.lang = lang;
+  zmVoiceRecognition.interimResults = true;
+  zmVoiceRecognition.continuous = false;
+  zmVoiceRecognition.onstart = () => { zmVoiceListening = true; if(btn) btn.innerText = "🎙️ Listening..."; };
+  zmVoiceRecognition.onresult = (event) => {
+    let txt = "";
+    for(let i=event.resultIndex; i<event.results.length; i++){ txt += event.results[i][0].transcript; }
+    if(output){ output.value = txt.trim(); previewVoiceCommand(); }
+  };
+  zmVoiceRecognition.onerror = (e) => alert("Voice error: " + e.error + ". Language ਬਦਲ ਕੇ try ਕਰੋ।");
+  zmVoiceRecognition.onend = () => { zmVoiceListening = false; if(btn) btn.innerText = "🎙️ Start Listening"; previewVoiceCommand(); };
+  zmVoiceRecognition.start();
+}
+function stopVoiceAssistant(){
+  if(zmVoiceRecognition && zmVoiceListening){ try{ zmVoiceRecognition.stop(); }catch(e){} }
+  zmVoiceListening = false;
+  const btn = document.getElementById("voiceStartBtn");
+  if(btn) btn.innerText = "🎙️ Start Listening";
+}
+function digitsToEnglish(s){
+  const map = {"੦":"0","੧":"1","੨":"2","੩":"3","੪":"4","੫":"5","੬":"6","੭":"7","੮":"8","੯":"9","०":"0","१":"1","२":"2","३":"3","४":"4","५":"5","६":"6","७":"7","८":"8","९":"9"};
+  return (s || "").replace(/[੦-੯०-९]/g, d => map[d] || d);
+}
+function normVoice(s){
+  return digitsToEnglish(s || "").toLowerCase().replace(/[₹,]/g," ").replace(/ਕਨਾਲਾਂ/g,"ਕਨਾਲ").replace(/ਕਿੱਲੇ|ਕਿਲੇ|ਕਿਲਾ/g,"ਕਿੱਲਾ").replace(/kanals/g,"kanal").replace(/marles/g,"marla").replace(/acres/g,"acre").replace(/\s+/g," ").trim();
+}
+function numBefore(t, words){
+  const re = new RegExp("(\\d+(?:\\.\\d+)?)\\s*(?:" + words.join("|") + ")", "i");
+  const m = t.match(re);
+  return m ? parseFloat(m[1]) : 0;
+}
+function largestNum(t){
+  const nums = [...t.matchAll(/\d+(?:\.\d+)?/g)].map(x=>parseFloat(x[0]));
+  return nums.length ? Math.max(...nums) : 0;
+}
+function parseVoiceCommand(text){
+  const t = normVoice(text);
+  const forced = document.getElementById("voiceCommandType")?.value || "auto";
+  const hasTheka = /ਠੇਕਾ|theka|lease|rent/.test(t);
+  const hasSale = /sale|sell|ਖਰੀਦ|ਵੇਚ|registry|ਰੇਟ/.test(t);
+  const hasMeasurement = /ਮਿਣਤੀ|measurement|area|sq|square|ਲੰਬਾਈ|ਚੌੜਾਈ|by|x/.test(t);
+  const type = forced !== "auto" ? forced : (hasTheka ? "theka" : hasSale ? "sale" : hasMeasurement ? "measurement" : "theka");
+  const acre = numBefore(t, ["ਏਕੜ","ਕਿੱਲਾ","acre","killa"]);
+  const kanal = numBefore(t, ["ਕਨਾਲ","kanal"]);
+  const marla = numBefore(t, ["ਮਰਲਾ","ਮਰਲੇ","marla"]);
+  let rate = 0;
+  let r = t.match(/(?:ਠੇਕਾ|theka|lease|rate|ਰੇਟ|ਨਾਲ)\s*(?:ਦਾ|de|of|with|ਨਾਲ)?\s*(\d+(?:\.\d+)?)/i) || t.match(/(\d+(?:\.\d+)?)\s*(?:ਦਾ|de|rate|ਰੇਟ|theka|ਠੇਕਾ|ਨਾਲ)/i);
+  rate = r ? parseFloat(r[1]) : largestNum(t);
+  let length = 0, width = 0;
+  let m = t.match(/(\d+(?:\.\d+)?)\s*(?:by|x|×|\*)\s*(\d+(?:\.\d+)?)/i);
+  if(m){ length = parseFloat(m[1]); width = parseFloat(m[2]); }
+  if(!length) length = numBefore(t, ["ਲੰਬਾਈ","length","lambai"]);
+  if(!width) width = numBefore(t, ["ਚੌੜਾਈ","width","chaurai"]);
+  return {raw:text, type, acre, kanal, marla, rate, length, width};
+}
+function previewVoiceCommand(){
+  const text = document.getElementById("voiceTextOutput")?.value || "";
+  const box = document.getElementById("voiceParsedPreview");
+  if(!text.trim() || !box) return;
+  const p = parseVoiceCommand(text);
+  zmLastParsedVoice = p;
+  box.innerHTML = `<h3>Voice Parsed Preview</h3><div class="voice-preview-grid">
+    <div><span>Type</span><b>${p.type}</b></div><div><span>Rate</span><b>${p.rate || 0}</b></div>
+    <div><span>ਏਕੜ/ਕਿੱਲਾ</span><b>${p.acre || 0}</b></div><div><span>ਕਨਾਲ</span><b>${p.kanal || 0}</b></div>
+    <div><span>ਮਰਲੇ</span><b>${p.marla || 0}</b></div><div><span>Length</span><b>${p.length || 0}</b></div>
+    <div><span>Width</span><b>${p.width || 0}</b></div></div><p class="voice-note">ਜੇ values ਸਹੀ ਹਨ ਤਾਂ Apply ਦਬਾਓ।</p>`;
+  box.classList.remove("hidden");
+}
+function setInputValue(ids, value){
+  if(!value) return false;
+  for(const id of ids){
+    const el = document.getElementById(id);
+    if(el){ el.value = value; el.dispatchEvent(new Event("input",{bubbles:true})); return true; }
+  }
+  return false;
+}
+function applyVoiceCommand(){
+  const text = document.getElementById("voiceTextOutput")?.value || "";
+  const p = zmLastParsedVoice || parseVoiceCommand(text);
+  if(!text.trim()) return alert("ਪਹਿਲਾਂ voice command ਬੋਲੋ ਜਾਂ text ਲਿਖੋ।");
+  if(p.type === "theka"){
+    if(typeof showModule === "function") showModule("theka");
+    setTimeout(()=>{ setInputValue(["sepAcreRate","thekaAcreRate","acreRate"], p.rate); setInputValue(["sepAcres","thekaAcres","acres"], p.acre); setInputValue(["sepKanal","thekaKanal","kanal"], p.kanal); setInputValue(["sepMarla","thekaMarla","marla"], p.marla); if(typeof calculateSeparateTheka === "function") calculateSeparateTheka(); closeVoiceAssistant(); }, 350);
+  } else if(p.type === "measurement"){
+    if(typeof showModule === "function") showModule("measurement");
+    setTimeout(()=>{ if(typeof setShape === "function") setShape("rectangle"); setInputValue(["length","plotLength"], p.length); setInputValue(["width","plotWidth"], p.width); const form=document.getElementById("calcForm"); if(form) form.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true})); closeVoiceAssistant(); }, 350);
+  } else if(p.type === "sale"){
+    if(typeof showModule === "function") showModule("sale");
+    setTimeout(()=>{ setInputValue(["saleAcreRate"], p.rate); setInputValue(["saleAcres"], p.acre); setInputValue(["saleKanal"], p.kanal); setInputValue(["saleMarla"], p.marla); if(typeof calculateSale === "function") calculateSale(); closeVoiceAssistant(); }, 350);
+  }
+}
+document.addEventListener("DOMContentLoaded", function(){
+  const txt = document.getElementById("voiceTextOutput");
+  if(txt) txt.addEventListener("input", previewVoiceCommand);
+});

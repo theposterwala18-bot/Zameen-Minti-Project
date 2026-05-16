@@ -1,0 +1,2 @@
+Supabase integration base added.
+Next phase: Auth, Chat, Reports, Roles.
